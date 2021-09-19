@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import com.sun.istack.NotNull;
+
 import lombok.Data;
 
 @Entity
@@ -22,20 +24,25 @@ public class FeedbacksToUs {
 	private int feedback_to_us_id;
 	@OneToOne
 	@JoinColumn(name = "meeting_id")
+	@NotNull
 	private Meetings meetings; 
 	@ManyToOne
 	@JoinColumn(name = "provider_user_id")
+	@NotNull
 	private Users provider_user_id; 
 	private boolean report_user;
 	@ManyToOne
 	@JoinColumn(name = "reportee_user_id")
+	@NotNull
 	private Users reportee_user_id; 
 	@Column(length = 20)
 	private String report_type;
 	@Column(length = 255)
 	private String report_description;
 	@Column(length = 255)
+	@NotNull
 	private String feedback_to_us;
+	@NotNull
 	private Timestamp created_at;
 	
 }

@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
+import com.sun.istack.NotNull;
+
 import lombok.Data;
 
 @Entity
@@ -20,6 +22,7 @@ public class Interests {
 	private int interest_id;
 	@OneToOne
 	@JoinColumn(name = "user_id")
+	@NotNull
 	private Users user;
 	private boolean art;
 	private boolean blogging;
@@ -33,7 +36,9 @@ public class Interests {
 	private boolean reading_books;
 	private boolean dance;
 	private boolean technology;
+	@NotNull
 	private Timestamp created_at;
+	@NotNull
 	private Timestamp modified_at;
 	
 }
