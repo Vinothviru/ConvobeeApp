@@ -22,6 +22,9 @@ public class Users {
 	@Column(length = 20)
 	@NotNull
 	private String user_name;
+	@Column(length = 20)
+	@NotNull
+	private String roles;
 	@Column(length = 10)
 	@NotNull
 	private String nick_name;
