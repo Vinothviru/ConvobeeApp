@@ -1,16 +1,16 @@
-package com.convobee.data.dto;
+package com.convobee.api.rest.request;
 
 import java.sql.Timestamp;
 
 import lombok.Data;
 
 @Data
-public class MeetingsDTO {
+public class MeetingsRequest {
 
 	private int meeting_id;
-	private SlotsDTO slots;
-	private UsersDTO user_a_id;
-	private UsersDTO user_b_id;
+	private SlotsRequest slots;
+	private UsersRequest user_a_id;
+	private UsersRequest user_b_id;
 	private String meeting_url;
 	private boolean meeting_status;
 	private Timestamp started_at;

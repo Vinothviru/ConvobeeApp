@@ -1,17 +1,17 @@
-package com.convobee.data.dto;
+package com.convobee.api.rest.request;
 
 import java.sql.Timestamp;
 
 import lombok.Data;
 
 @Data
-public class FeedbacksToUsDTO {
+public class FeedbacksToUsRequest {
 
 	private int feedback_to_us_id;
-	private MeetingsDTO meetings; 
-	private UsersDTO provider_user_id; 
+	private MeetingsRequest meetings; 
+	private UsersRequest provider_user_id; 
 	private boolean report_user;
-	private UsersDTO reportee_user_id; 
+	private UsersRequest reportee_user_id; 
 	private String report_type;
 	private String report_description;
 	private String feedback_to_us;

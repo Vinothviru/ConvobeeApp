@@ -1,11 +1,11 @@
-package com.convobee.data.dto;
+package com.convobee.api.rest.request;
 
 import java.sql.Timestamp;
 
 import lombok.Data;
 
 @Data
-public class UsersDTO {
+public class UsersRequest {
 
 	private int user_id;
 	private String user_name;
