@@ -15,12 +15,14 @@ import com.convobee.data.entity.Users;
 @Service
 public class AuthUserDetails implements UserDetails{
 	
+	private int userid;
 	private String mailid;
 	private String password;
 	private List<GrantedAuthority> authorities;
 	
 	public AuthUserDetails(Users user)
 	{
+		this.userid = user.getUserid();
 		this.mailid = user.getMailid();
 		this.password = user.getPassword();
 		this.authorities = Arrays.stream(user.getRole().split(","))
@@ -31,6 +33,14 @@ public class AuthUserDetails implements UserDetails{
 	public AuthUserDetails() {
 		
 	}
+	
+	public int getUserid() {
+		return userid;
+	}
+	public void setUserid(int userid) {
+		this.userid = userid;
+	}
+	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub

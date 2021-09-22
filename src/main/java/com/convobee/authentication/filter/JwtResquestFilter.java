@@ -1,7 +1,6 @@
 package com.convobee.authentication.filter;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -11,23 +10,23 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.convobee.authentication.AuthUserDetails;
+import com.convobee.authentication.AuthUserDetailsService;
 import com.convobee.utils.JWTUtil;
 
 @Component
 public class JwtResquestFilter extends OncePerRequestFilter{
 
 	@Autowired
-	UserDetailsService userDetailsService;
+	AuthUserDetailsService userDetailsService;
 	
 	@Autowired
 	JWTUtil jwtUtil;
-	
+		
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
@@ -39,13 +38,11 @@ public class JwtResquestFilter extends OncePerRequestFilter{
 		{
 			jwt = authorizationHeader.substring(7);
 			username = jwtUtil.extractUsername(jwt);
-			List<Object> roles = jwtUtil.extractUserRole(jwt);
-			System.out.println("roles value = "+roles.get(0));
 		}
 		
 		if(username != null && SecurityContextHolder.getContext().getAuthentication() == null)
 		{
-			UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+			AuthUserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 			if(jwtUtil.validateToken(jwt, userDetails)) {
 			UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 					userDetails, null, userDetails.getAuthorities()
@@ -54,6 +51,7 @@ public class JwtResquestFilter extends OncePerRequestFilter{
 					new WebAuthenticationDetailsSource().buildDetails(request)
 					);
 			SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+			System.out.println("USER ID via AuthDetails in = JwtResquestFilter" + userDetails.getUserid());
 			}
 		}
 		chain.doFilter(request, response);

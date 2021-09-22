@@ -1,14 +1,16 @@
 package com.convobee.utils;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+
+import com.convobee.authentication.AuthUserDetails;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -16,11 +18,15 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class JWTUtil {
-	public String SECRET_KEY = "secret";
-	//we can change this to user_id
-	public List<Object> extractUserRole(String token) {
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
+	@Autowired
+	UserDetailsService userDetailsService;
+	
+	//Get user_id
+	public int extractUserId(String token) {
 		Claims claims = extractAllClaims(token);
-		return Arrays.asList(claims.get("role"));
+		return (int) claims.get("userid");
 	}
 	
 	public String extractUsername(String token) {
@@ -43,22 +49,21 @@ public class JWTUtil {
 	private boolean isTokenExpired(String token) {
 		return extractExpiration(token).before(new Date());
 	}
-	
-	public String generateToken(UserDetails UserDetails) {
+	public String generateToken(AuthUserDetails userDetails) {
 		Map<String, Object> claims = new HashMap<>();
-		claims.put("role", UserDetails.getAuthorities());//add userid
-		return createToken(claims, UserDetails.getUsername());
+		claims.put("userid", userDetails.getUserid());//add userid
+		return createToken(claims, userDetails.getUsername());
 	}
 
 	private String createToken(Map<String, Object> claims, String subject) {
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis()+1000*60*60*10))
 				.signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
-				//.setId(claims.get("userid").toString())
+				
 				
 	}
 	
-	public boolean validateToken(String token, UserDetails userDetails) {
+	public boolean validateToken(String token, AuthUserDetails userDetails) {
 		final String username = extractUsername(token);
 		return (username.equals(userDetails.getUsername())&&!isTokenExpired(token));
 	}
