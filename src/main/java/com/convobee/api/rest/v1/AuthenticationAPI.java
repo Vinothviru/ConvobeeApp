@@ -58,4 +58,10 @@ public class AuthenticationAPI {
 		System.out.println("Auth API User ID = " + userUtil.getLoggedInUserId(request));
 		return "Worked";
 	}
+	
+	@RequestMapping(value = "/admin", method = RequestMethod.GET)
+	public String admin()
+	{
+		return "Worked admin";
+	}
 }
