@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.Data;
 
 @Entity
@@ -31,7 +33,7 @@ public class Users {
 	@Column(length = 15)
 	@NotNull
 	private String password;
-	@Column(name = "mail_id", length = 30)
+	@Column(name = "mail_id", length = 30, unique = true)
 	@NotNull
 	private String mailid;
 	@Column(length = 20)
