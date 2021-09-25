@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import com.convobee.api.rest.request.AuthenticationRequest;
@@ -31,7 +32,7 @@ public class AuthenticationService {
 
 	@Autowired
 	UsersService usersService;
-	
+
 	public String signupAuthentication(UsersRequest usersRequest) throws Exception {
 		Users user = usersMapper.mapUserFromRequest(usersRequest);
 		usersService.createUser(user);
@@ -39,7 +40,7 @@ public class AuthenticationService {
 		final String jwt = jwtUtil.generateToken(userDetails);
 		return jwt;
 	}
-	
+
 	public String loginAuthentication(AuthenticationRequest authenticationRequest) throws Exception {
 		try {
 			authenticationManager.authenticate(
@@ -52,5 +53,18 @@ public class AuthenticationService {
 		final AuthUserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getMailid());
 		final String jwt = jwtUtil.generateToken(userDetails);
 		return jwt;
+	}
+
+	public String oauthLoginAuthentication(OAuth2User principal) throws Exception {
+		try {
+			String mailid = (principal.getAttribute("email")).toString();
+
+			final AuthUserDetails userDetails = userDetailsService.loadUserByUsername(mailid);
+			final String jwt = jwtUtil.generateToken(userDetails);
+			return jwt;
+		}
+		catch(BadCredentialsException e) {
+			throw new Exception("Incorrect Username or Password", e);
+		}
 	}
 }

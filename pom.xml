@@ -16,7 +16,22 @@
 	<properties>
 		<java.version>11</java.version>
 	</properties>
-	<dependencies>
+	 <dependencies>
+			<!-- <dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-oauth2</artifactId>
+			<version>2.0.0.RELEASE</version>
+		</dependency>
+		<dependency>
+  <groupId>org.springframework.cloud</groupId>
+  <artifactId>spring-cloud-starter-bootstrap</artifactId>
+  <version>3.0.1</version>
+</dependency>
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        <version>3.0.2</version>
+    </dependency> -->
 		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
 		<dependency>
 		    <groupId>io.jsonwebtoken</groupId>
@@ -29,6 +44,16 @@
 			    <artifactId>jaxb-api</artifactId>
 			    <version>2.3.0</version>
 			</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-oauth2-client -->
+		<dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-oauth2-client</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-oauth2-jose -->
+		<dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-oauth2-jose</artifactId>
+		</dependency>
 		<dependency> 
 	        <groupId>org.hibernate</groupId>
 	        <artifactId>hibernate-validator</artifactId>

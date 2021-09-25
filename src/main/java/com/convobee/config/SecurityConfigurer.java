@@ -2,6 +2,7 @@ package com.convobee.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,44 +17,53 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.convobee.authentication.filter.JwtResquestFilter;
 
 @EnableWebSecurity
+@Configuration
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
-	
+
 	@Autowired
 	private UserDetailsService userDetailsService;
-	
+
 	@Autowired
 	private JwtResquestFilter jwtResquestFilter;
-	
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService);
 	}
-	
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+
 		http.csrf().disable()
+		.antMatcher("/**")
+		.authorizeRequests()
+		.antMatchers("/").permitAll()
+		.antMatchers("/admin").hasRole("ADMIN")
+		.antMatchers("/hello").hasAnyRole("USER","ADMIN")
+		.antMatchers("/signup").permitAll()
+		.antMatchers("/login").permitAll()
+		.anyRequest().authenticated()
+		.and()
+		.oauth2Login()
+		.and().sessionManagement()
+		.sessionCreationPolicy(SessionCreationPolicy.NEVER);
+
+		http.addFilterBefore(jwtResquestFilter, UsernamePasswordAuthenticationFilter.class);
+
+		/*http.csrf().disable()
 						.authorizeRequests()		
 						.antMatchers("/admin").hasRole("ADMIN")
 						.antMatchers("/hello").hasAnyRole("USER","ADMIN")
 						.antMatchers("/signup").permitAll()
-						.antMatchers("/login").permitAll().
-						anyRequest().authenticated()
+						.antMatchers("/oauthsignup").permitAll()
+						.antMatchers("/login").permitAll()
+						.anyRequest().authenticated()
+						.and()
+						.oauth2Login();
 						.and().sessionManagement()
-						.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		
-		http.addFilterBefore(jwtResquestFilter, UsernamePasswordAuthenticationFilter.class);
-		
+						.sessionCreationPolicy(SessionCreationPolicy.STATELESS);*/
 	}
-	/*@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
-				.antMatchers("/admin").hasRole("ADMIN")
-				.antMatchers("/hello").hasAnyRole("USER","ADMIN")
-				.antMatchers("/").permitAll()
-				.and().formLogin();
-	}
-	*/
-	
+
 	@Bean
 	public PasswordEncoder getPasswordEncoder() {
 		return NoOpPasswordEncoder.getInstance();
@@ -64,6 +74,12 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	public AuthenticationManager authenticationManagerBean() throws Exception{
 		return super.authenticationManagerBean();
 	}
+
+	//https://stackoverflow.com/questions/30366405/how-to-disable-spring-security-for-particular-url
+	//	@Override
+	//	public void configure(WebSecurity web) throws Exception {
+	//	    web.ignoring().antMatchers("/oauthsignup");
+	//	}
 
 
 }
