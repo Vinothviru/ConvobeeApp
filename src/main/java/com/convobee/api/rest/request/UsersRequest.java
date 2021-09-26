@@ -1,5 +1,7 @@
 package com.convobee.api.rest.request;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -17,5 +19,6 @@ public class UsersRequest {
 	private String signuptype;
 	private int reportcount;
 	private boolean isfeedback_given;
+	private List<String> interests;
 	
 }

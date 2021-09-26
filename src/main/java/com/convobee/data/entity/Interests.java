@@ -2,6 +2,7 @@ package com.convobee.data.entity;
 
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,21 +24,33 @@ public class Interests {
 	@JoinColumn(name = "user_id")
 	@NotNull
 	private Users user;
+	@Column(columnDefinition = "boolean default false")
 	private boolean art;
+	@Column(columnDefinition = "boolean default false")
 	private boolean blogging;
+	@Column(columnDefinition = "boolean default false")
 	private boolean acting;
+	@Column(columnDefinition = "boolean default false")
 	private boolean sports;
+	@Column(columnDefinition = "boolean default false")
 	private boolean gaming;
+	@Column(columnDefinition = "boolean default false")
 	private boolean traveling;
-	private boolean pet_care;
+	@Column(name = "pet_care", columnDefinition = "boolean default false")
+	private boolean petcare;
+	@Column(columnDefinition = "boolean default false")
 	private boolean music;
+	@Column(columnDefinition = "boolean default false")
 	private boolean cooking;
-	private boolean reading_books;
+	@Column(name = "reading_books", columnDefinition = "boolean default false")
+	private boolean readingbooks;
+	@Column(columnDefinition = "boolean default false")
 	private boolean dance;
+	@Column(columnDefinition = "boolean default false")
 	private boolean technology;
 	@NotNull
-	private Timestamp created_at;
+	private Timestamp createdat;
 	@NotNull
-	private Timestamp modified_at;
+	private Timestamp modifiedat;
 	
 }
