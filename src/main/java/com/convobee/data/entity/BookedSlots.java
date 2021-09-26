@@ -2,6 +2,7 @@ package com.convobee.data.entity;
 
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,9 +28,11 @@ public class BookedSlots {
 	@JoinColumn(name = "slot_id")
 	@NotNull
 	private Slots slots;
+	@Column(name = "created_at")
 	@NotNull
-	private Timestamp created_at;
+	private Timestamp createdat;
+	@Column(name = "modified_at")
 	@NotNull
-	private Timestamp modified_at;
+	private Timestamp modifiedat;
 	
 }

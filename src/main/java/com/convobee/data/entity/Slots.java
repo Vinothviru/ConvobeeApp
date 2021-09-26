@@ -17,13 +17,16 @@ public class Slots {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int slot_id;
+	@Column(name = "slot_id")
+	private int slotid;
+	@Column(name = "slot_time")
 	@NotNull
-	private Timestamp slot_time;
-	@Column(length = 255)
+	private Timestamp slottime;
+	@Column(name = "slot_url", length = 255)
 	@NotNull
-	private String slot_url;
+	private String sloturl;
+	@Column(name = "created_at") 
 	@NotNull
-	private Timestamp created_at;
+	private Timestamp createdat;
 	
 }

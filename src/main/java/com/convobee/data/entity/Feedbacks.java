@@ -20,7 +20,8 @@ public class Feedbacks {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int feedback_id;
+	@Column(name = "feedback_id")
+	private int feedbackid;
 	@OneToOne
 	@JoinColumn(name = "meeting_id")
 	@NotNull
@@ -28,23 +29,27 @@ public class Feedbacks {
 	@ManyToOne
 	@JoinColumn(name = "provider_user_id")
 	@NotNull
-	private Users provider_user_id;
+	private Users provideruser;
 	@ManyToOne
 	@JoinColumn(name = "receiver_user_id")
 	@NotNull
-	private Users receiver_user_id;
+	private Users receiveruser;
+	@Column(name = "impression_level")
 	@NotNull
-	private float impression_level;
+	private float impressionlevel;
+	@Column(name = "confidence_level")
 	@NotNull
-	private float confidence_level;
+	private float confidencelevel;
+	@Column(name = "proficiency_level")
 	@NotNull
-	private float proficiency_level;
-	@Column(length = 255)
+	private float proficiencylevel;
+	@Column(name = "appreciate_feedback", length = 255)
 	@NotNull
-	private String appreciate_feedback;
-	@Column(length = 255)
+	private String appreciatefeedback;
+	@Column(name = "advise_feedback", length = 255)
 	@NotNull
-	private String advise_feedback; 
+	private String advisefeedback; 
+	@Column(name = "created_at")
 	@NotNull
-	private Timestamp created_at;
+	private Timestamp createdat;
 }

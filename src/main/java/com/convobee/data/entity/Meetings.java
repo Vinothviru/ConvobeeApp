@@ -19,7 +19,8 @@ public class Meetings {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int meeting_id;
+	@Column(name = "meeting_id")
+	private int meetingid;
 	@ManyToOne
 	@JoinColumn(name = "slot_id")
 	@NotNull
@@ -32,13 +33,15 @@ public class Meetings {
 	@JoinColumn(name = "user_b_id")
 	@NotNull
 	private Users user_b_id;
-	@Column(length = 255)
+	@Column(name = "meeting_url", length = 255)
 	@NotNull
-	private String meeting_url;
+	private String meetingurl;
 	@NotNull
 	private boolean meeting_status;
+	@Column(name  = "started_at")
 	@NotNull
-	private Timestamp started_at;
-	private Timestamp ended_at;
+	private Timestamp startedat;
+	@Column(name  = "ended_at")
+	private Timestamp endedat;
 	
 }
