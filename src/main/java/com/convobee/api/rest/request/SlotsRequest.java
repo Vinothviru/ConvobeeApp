@@ -8,4 +8,5 @@ public class SlotsRequest {
 	private String fromtime;
 	private String todate;
 	private String totime;
+	private String timezone;
 }

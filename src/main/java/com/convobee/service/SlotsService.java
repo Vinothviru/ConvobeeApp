@@ -3,6 +3,10 @@ package com.convobee.service;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.convobee.api.rest.request.SlotsRequest;
 import com.convobee.data.entity.Slots;
 import com.convobee.data.repository.SlotsRepo;
+import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.SlotUtil;
 
 @Service
@@ -56,5 +61,21 @@ public class SlotsService {
 			dif += 3600000/2;
 		}
 		slotsRepo.saveAll(slotsList);
+	}
+
+
+	public void showSlots(String timezone) {
+		final LocalDateTime now = LocalDateTime.of(LocalDate.now(ZoneId.of(timezone)), LocalTime.of(07, 00, 00));
+        final LocalDateTime utc = DateTimeUtil.toUtc(now, timezone);
+        String utcStartTempDate = utc.toLocalDate().toString();
+        String utcStartDate = utcStartTempDate.replace('T', ' ');
+        String utcEndDate = utc.toLocalDate().plusDays(14).toString().replace('T', ' '); 
+        System.out.println(slotsRepo.findSlotsByDates(utcStartDate));
+       /* System.out.println(timezone+" Zone");
+        System.out.println("Now: " + now);
+        System.out.println("UTC: " + utc);
+        System.out.println("Start date " + utc.toLocalDate());
+        System.out.println("End date " + utc.toLocalDate().plusDays(14));
+        System.out.println("");*/
 	}
 }
