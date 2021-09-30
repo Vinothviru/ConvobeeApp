@@ -86,28 +86,28 @@ public class SlotsService {
 				utc = utc.plusDays(1);
 			}
 			flag = 1;
-				
-					List<String> finalTime = new LinkedList<String>();
-					int count = 0;
-					for(int hoursToAdd = 0; count<9 ; ) {
-						if(count==4) {
-							hoursToAdd+=6;
-						}
-						System.out.println("localDT+1 = " + utc.plusHours(hoursToAdd).toString().replace('T', ' '));
-						finalTime.add(utc.plusHours(hoursToAdd).toString().replace('T', ' '));
-						count++;
-						hoursToAdd++;
-					}
-					//System.out.println(slotsRepo.findSlotsIdByDateTime(finalTime));
-					List<Integer> finalSlotIds = slotsRepo.findSlotsIdByDateTime(finalTime);
-					List<String> timings = SlotUtil.getSlotTimings(minuteDiff);
-					map = IntStream.range(0, finalSlotIds.size())
-                            .collect(
-                            	 LinkedHashMap::new, 
-                                 (m, k) -> m.put(finalSlotIds.get(k), timings.get(k)), 
-                                 Map::putAll
-                            );
-					finalMap.put(utc.toLocalDate().toString(), map);
+
+			List<String> finalTime = new LinkedList<String>();
+			int count = 0;
+			for(int hoursToAdd = 0; count<9 ; ) {
+				if(count==4) {
+					hoursToAdd+=6;
+				}
+				System.out.println("localDT+1 = " + utc.plusHours(hoursToAdd).toString().replace('T', ' '));
+				finalTime.add(utc.plusHours(hoursToAdd).toString().replace('T', ' '));
+				count++;
+				hoursToAdd++;
+			}
+			//System.out.println(slotsRepo.findSlotsIdByDateTime(finalTime));
+			List<Integer> finalSlotIds = slotsRepo.findSlotsIdByDateTime(finalTime);
+			List<String> timings = SlotUtil.getSlotTimings(minuteDiff);
+			map = IntStream.range(0, finalSlotIds.size())
+					.collect(
+							LinkedHashMap::new, 
+							(m, k) -> m.put(finalSlotIds.get(k), timings.get(k)), 
+							Map::putAll
+							);
+			finalMap.put(utc.toLocalDate().toString(), map);
 		}
 		return finalMap;
 	}
