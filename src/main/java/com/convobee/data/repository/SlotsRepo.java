@@ -10,8 +10,8 @@ import com.convobee.data.entity.Slots;
 
 public interface SlotsRepo extends JpaRepository<Slots, Integer>{
 
-	@Query(value ="SELECT s FROM Slots s WHERE slot_time LIKE :startDate%")
-	LinkedList<Slots> findSlotsByDates(String startDate);
+	/*@Query(value ="SELECT s FROM Slots s WHERE slot_time LIKE :startDate%")
+	LinkedList<Slots> findSlotsByDates(String startDate);*/
 	
 	@Query(value ="SELECT s.slotid FROM Slots s WHERE slot_time in :finalTime")
 	LinkedList<Integer> findSlotsIdByDateTime(List<String> finalTime);

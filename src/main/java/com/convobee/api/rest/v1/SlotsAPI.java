@@ -1,6 +1,5 @@
 package com.convobee.api.rest.v1;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.convobee.api.rest.request.SlotsRequest;
-import com.convobee.data.entity.Slots;
 import com.convobee.service.SlotsService;
 
 @RestController
@@ -28,7 +26,7 @@ public class SlotsAPI {
 	}
 	
 	@RequestMapping(value = "/showslots", method = RequestMethod.GET)
-	public Map<Integer, String> showSlots(@ModelAttribute SlotsRequest slotsRequest) throws Exception{
+	public Map<String, Map<Integer, String>> showSlots(@ModelAttribute SlotsRequest slotsRequest) throws Exception{
 		return slotsService.showSlots(slotsRequest.getTimezone());
 		
 		//return ResponseEntity.ok(new String("Done"));
