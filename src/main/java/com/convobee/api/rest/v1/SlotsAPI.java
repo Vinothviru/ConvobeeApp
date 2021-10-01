@@ -48,9 +48,16 @@ public class SlotsAPI {
 	}
 	
 	@RequestMapping(value = "/rescheduleslot", method = RequestMethod.PUT)
-	public int rescheduleSlot(@RequestBody BookedSlotsRequest bookedSlotsRequest) 
+	public int rescheduleBookedSlot(@RequestBody BookedSlotsRequest bookedSlotsRequest) 
 	{
-		int bookedSLotId = bookedSlotsService.rescheduleSlot(bookedSlotsRequest);
-		return bookedSLotId;
+		int bookedSlotId = bookedSlotsService.rescheduleBookedSlot(bookedSlotsRequest);
+		return bookedSlotId;
+	}
+	
+	@RequestMapping(value = "/deleteslot/{bookedslotid}", method = RequestMethod.DELETE)
+	public String deleteBookedSlot(@PathVariable int bookedslotid) 
+	{
+		String isDeletedSlot = bookedSlotsService.deleteBookedSlot(bookedslotid);
+		return isDeletedSlot;
 	}
 }

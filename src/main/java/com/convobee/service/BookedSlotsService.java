@@ -30,10 +30,15 @@ public class BookedSlotsService {
 		return bookedSlotAfterAddition.getBookedslotid();
 	}
 	
-	public int rescheduleSlot(BookedSlotsRequest bookedSlotsRequest) {
-		BookedSlots reschBookedSlots = bookedSlotsMapper.mapBookedSlotsForReschedule(bookedSlotsRequest);
-		BookedSlots bookedSlotAfterUpdation = bookedSlotsRepo.save(reschBookedSlots);
+	public int rescheduleBookedSlot(BookedSlotsRequest bookedSlotsRequest) {
+		BookedSlots rescheduleBookedSlot = bookedSlotsMapper.mapBookedSlotsForReschedule(bookedSlotsRequest);
+		BookedSlots bookedSlotAfterUpdation = bookedSlotsRepo.save(rescheduleBookedSlot);
 		return bookedSlotAfterUpdation.getBookedslotid();
 	}
-
+	
+	public String deleteBookedSlot(int bookedslotid) {
+		BookedSlots deleteBookedSlot = bookedSlotsRepo.getById(bookedslotid);
+		bookedSlotsRepo.delete(deleteBookedSlot);
+		return "Successfully deleted";
+	}
 }
