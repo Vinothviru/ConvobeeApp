@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.convobee.api.rest.request.BookedSlotsRequest;
 import com.convobee.data.entity.BookedSlots;
 import com.convobee.data.mapper.BookedSlotsMapper;
 import com.convobee.data.repository.BookedSlotsRepo;
@@ -22,10 +23,17 @@ public class BookedSlotsService {
 	@Autowired
 	BookedSlotsRepo bookedSlotsRepo;
 	
-	public String bookSlot(HttpServletRequest request, int slotid) {
+	public int bookSlot(HttpServletRequest request, int slotid) {
 		int userid = userUtil.getLoggedInUserId(request);
 		BookedSlots bookedSlot = bookedSlotsMapper.mapBookedSlots(userid, slotid);
-		bookedSlotsRepo.save(bookedSlot);
-		return "OK";
+		BookedSlots bookedSlotAfterAddition = bookedSlotsRepo.save(bookedSlot);
+		return bookedSlotAfterAddition.getBookedslotid();
 	}
+	
+	public int rescheduleSlot(BookedSlotsRequest bookedSlotsRequest) {
+		BookedSlots reschBookedSlots = bookedSlotsMapper.mapBookedSlotsForReschedule(bookedSlotsRequest);
+		BookedSlots bookedSlotAfterUpdation = bookedSlotsRepo.save(reschBookedSlots);
+		return bookedSlotAfterUpdation.getBookedslotid();
+	}
+
 }

@@ -11,15 +11,20 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import lombok.Data;
 
 @Entity
 @Data
+@DynamicUpdate
+
 public class BookedSlots {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int booked_slot_id;
+	@Column(name = "booked_slot_id")
+	private int bookedslotid;
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	@NotNull

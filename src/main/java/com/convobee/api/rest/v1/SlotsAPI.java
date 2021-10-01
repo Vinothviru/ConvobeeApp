@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.convobee.api.rest.request.BookedSlotsRequest;
 import com.convobee.api.rest.request.SlotsRequest;
 import com.convobee.service.BookedSlotsService;
 import com.convobee.service.SlotsService;
@@ -40,9 +41,16 @@ public class SlotsAPI {
 	}
 	
 	@RequestMapping(value = "/bookslot/{slotid}", method = RequestMethod.POST)
-	public String bookSlot(HttpServletRequest request, @PathVariable int slotid)
+	public int bookSlot(HttpServletRequest request, @PathVariable int slotid)
 	{
-		bookedSlotsService.bookSlot(request, slotid);
-		return "OK";
+		int bookedSLotId = bookedSlotsService.bookSlot(request, slotid);
+		return bookedSLotId;
+	}
+	
+	@RequestMapping(value = "/rescheduleslot", method = RequestMethod.PUT)
+	public int rescheduleSlot(@RequestBody BookedSlotsRequest bookedSlotsRequest) 
+	{
+		int bookedSLotId = bookedSlotsService.rescheduleSlot(bookedSlotsRequest);
+		return bookedSLotId;
 	}
 }
