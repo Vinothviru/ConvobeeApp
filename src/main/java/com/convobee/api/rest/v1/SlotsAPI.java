@@ -48,16 +48,23 @@ public class SlotsAPI {
 	}
 	
 	@RequestMapping(value = "/rescheduleslot", method = RequestMethod.PUT)
-	public int rescheduleBookedSlot(@RequestBody BookedSlotsRequest bookedSlotsRequest) 
+	public int rescheduleBookedSlot(HttpServletRequest request, @RequestBody BookedSlotsRequest bookedSlotsRequest) 
 	{
-		int bookedSlotId = bookedSlotsService.rescheduleBookedSlot(bookedSlotsRequest);
+		int bookedSlotId = bookedSlotsService.rescheduleBookedSlot(request,bookedSlotsRequest);
 		return bookedSlotId;
 	}
 	
 	@RequestMapping(value = "/deleteslot/{bookedslotid}", method = RequestMethod.DELETE)
-	public String deleteBookedSlot(@PathVariable int bookedslotid) 
+	public String deleteBookedSlot(HttpServletRequest request, @PathVariable int bookedslotid) 
 	{
-		String isDeletedSlot = bookedSlotsService.deleteBookedSlot(bookedslotid);
+		String isDeletedSlot = bookedSlotsService.deleteBookedSlot(request, bookedslotid);
 		return isDeletedSlot;
+	}
+	
+	@RequestMapping(value = "/getupcomingsessions", method = RequestMethod.GET)
+	public String getUpcomingSessions(HttpServletRequest request) 
+	{
+		String slotList = bookedSlotsService.getUpcomingSessions(request);
+		return slotList;
 	}
 }
