@@ -1,5 +1,7 @@
 package com.convobee.api.rest.v1;
 
+import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,9 +64,10 @@ public class SlotsAPI {
 	}
 	
 	@RequestMapping(value = "/getupcomingsessions", method = RequestMethod.GET)
-	public String getUpcomingSessions(HttpServletRequest request) 
+	public Map<Timestamp, Integer> getUpcomingSessions(HttpServletRequest request) 
 	{
-		String slotList = bookedSlotsService.getUpcomingSessions(request);
+		Map<Timestamp, Integer> slotList = bookedSlotsService.getUpcomingSessions(request);
+		System.out.println("Final result at API = " + slotList);
 		return slotList;
 	}
 }
