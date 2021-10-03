@@ -64,9 +64,9 @@ public class SlotsAPI {
 	}
 	
 	@RequestMapping(value = "/getupcomingsessions", method = RequestMethod.GET)
-	public Map<Timestamp, Integer> getUpcomingSessions(HttpServletRequest request) 
+	public Map<String, Integer> getUpcomingSessions(HttpServletRequest request) 
 	{
-		Map<Timestamp, Integer> slotList = bookedSlotsService.getUpcomingSessions(request);
+		Map<String, Integer> slotList = bookedSlotsService.getUpcomingSessions(request);
 		System.out.println("Final result at API = " + slotList);
 		return slotList;
 	}

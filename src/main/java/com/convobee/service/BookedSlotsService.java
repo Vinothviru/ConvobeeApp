@@ -1,7 +1,7 @@
 package com.convobee.service;
 
-import java.sql.Timestamp;
-import java.util.HashMap;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -51,38 +51,18 @@ public class BookedSlotsService {
 		return "Successfully deleted";
 	}
 
-	public Map<Timestamp, Integer> getUpcomingSessions(HttpServletRequest request) {
+	public Map<String, Integer> getUpcomingSessions(HttpServletRequest request) {
 		int userid = userUtil.getLoggedInUserId(request);
-		/*Users user = new Users();
-		user.setUserid(userid);*/
-		//System.out.println(bookedSlotsRepo.findAllByUserid(userid));
-		LinkedList<Object[]> listOfBookedslot = bookedSlotsRepo.findAllByUserid(userid);
-		//Collection<BookedSlotsResponse> listOfBookedslot = bookedSlotsRepo.findAllByUserid(userid);
-		Map<Timestamp, Integer> finalMap = new LinkedHashMap<Timestamp, Integer>(); 
-		/*for(Map<Integer, Timestamp> map : listOfBookedslot)
-		{
-			System.out.println(map.keySet() + " " + map.values());
-			finalMap.put(map.get(0), map.get(1));
-		}*/
-		//System.out.println(listOfBookedslot.get(0)[0] + " " + listOfBookedslot.get(0)[1]);
-		//System.out.println(listOfBookedslot.get(1)[0] + " " + listOfBookedslot.get(1)[1]);
+		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
+		//System.out.println("DATETIME = " + utc.toInstant());
+		//System.out.println("DATETIME = " + utc);
+		LinkedList<Object[]> listOfBookedslot = bookedSlotsRepo.findAllByUserid(userid, utc);
+		Map<String, Integer> finalMap = new LinkedHashMap<String, Integer>(); 
 		int size = listOfBookedslot.size();
 		for(int i = 0; i<size ;i++) {
-			finalMap.put( Timestamp.valueOf(listOfBookedslot.get(i)[1].toString()), Integer.valueOf(listOfBookedslot.get(i)[0].toString()));
+			finalMap.put( String.valueOf(listOfBookedslot.get(i)[1].toString().replace('T', ' ')), Integer.valueOf(listOfBookedslot.get(i)[0].toString()));
 		}
-		//finalMap.put(Integer.valueOf(listOfBookedslot.get(0)[0].toString()), Timestamp.valueOf(listOfBookedslot.get(0)[1].toString()));
-		System.out.println("Final result = " + finalMap);
-		//System.out.println(listOfBookedslot);
-		//System.out.println(listOfBookedslot.get(0)[0]);
-		//System.out.println(listOfBookedslot);
-	    //List<BookedSlots> bookedSlotList= bookedSlotsRepo.findAllByUsers(user);
-	    /*Map<Integer, Timestamp> returnSlots = new TreeMap<Integer, Timestamp>();
-	    for(BookedSlots bookedSlot : bookedSlotList)
-	    {
-	    	Slots slot = bookedSlot.getSlots();
-	    	returnSlots.put(bookedSlot.getBookedslotid(), slot.getSlottime());
-	    }
-	    System.out.println(returnSlots);*/
+		//System.out.println("Final result = " + finalMap);
 	    return finalMap;
 	}
 	
