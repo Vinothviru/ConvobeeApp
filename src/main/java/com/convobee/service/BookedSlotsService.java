@@ -1,5 +1,6 @@
 package com.convobee.service;
 
+import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
@@ -29,34 +30,36 @@ public class BookedSlotsService {
 	@Autowired
 	BookedSlotsRepo bookedSlotsRepo;
 	
-	public int bookSlot(HttpServletRequest request, int slotid) {
+	public Map<String, Integer> bookSlot(HttpServletRequest request, int slotid) {
 		int userid = userUtil.getLoggedInUserId(request);
 		BookedSlots bookedSlot = bookedSlotsMapper.mapBookedSlots(userid, slotid);
 		BookedSlots bookedSlotAfterAddition = bookedSlotsRepo.save(bookedSlot);
-		getUpcomingSessions(request);//need to handle it properly
-		return bookedSlotAfterAddition.getBookedslotid();
+		return getUpcomingSessions(request);//need to handle it properly
+		//return bookedSlotAfterAddition.getBookedslotid();
 	}
 	
-	public int rescheduleBookedSlot(HttpServletRequest request, BookedSlotsRequest bookedSlotsRequest) {
+	public Map<String, Integer> rescheduleBookedSlot(HttpServletRequest request, BookedSlotsRequest bookedSlotsRequest) {
 		BookedSlots rescheduleBookedSlot = bookedSlotsMapper.mapBookedSlotsForReschedule(bookedSlotsRequest);
+		/* Need to be handled the user has to reschedule only his data not others, we can achieve this through transaction rollback after persisting also */
 		BookedSlots bookedSlotAfterUpdation = bookedSlotsRepo.save(rescheduleBookedSlot);
-		getUpcomingSessions(request);
-		return bookedSlotAfterUpdation.getBookedslotid();
+		return getUpcomingSessions(request);
 	}
 	
-	public String deleteBookedSlot(HttpServletRequest request, int bookedslotid) {
+	public Map<String, Integer> deleteBookedSlot(HttpServletRequest request, int bookedslotid) {
 		BookedSlots deleteBookedSlot = bookedSlotsRepo.getById(bookedslotid);
-		bookedSlotsRepo.delete(deleteBookedSlot);
-		getUpcomingSessions(request);
-		return "Successfully deleted";
+		/* Handled the user has to delete only his data not others */
+		if(deleteBookedSlot.getUsers().getUserid()==userUtil.getLoggedInUserId(request)) {
+			bookedSlotsRepo.delete(deleteBookedSlot);
+		}
+		return getUpcomingSessions(request);
 	}
 
+	/* Need to handle the 3 minutes delay for showing upcoming session*/
 	public Map<String, Integer> getUpcomingSessions(HttpServletRequest request) {
 		int userid = userUtil.getLoggedInUserId(request);
 		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
-		//System.out.println("DATETIME = " + utc.toInstant());
 		//System.out.println("DATETIME = " + utc);
-		LinkedList<Object[]> listOfBookedslot = bookedSlotsRepo.findAllByUserid(userid, utc);
+		LinkedList<Object[]> listOfBookedslot = bookedSlotsRepo.findAllByUserid(userid, Timestamp.valueOf(utc.toLocalDateTime()));
 		Map<String, Integer> finalMap = new LinkedHashMap<String, Integer>(); 
 		int size = listOfBookedslot.size();
 		for(int i = 0; i<size ;i++) {

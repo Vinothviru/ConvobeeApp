@@ -1,7 +1,5 @@
 package com.convobee.api.rest.v1;
 
-import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,23 +41,23 @@ public class SlotsAPI {
 	}
 	
 	@RequestMapping(value = "/bookslot/{slotid}", method = RequestMethod.POST)
-	public int bookSlot(HttpServletRequest request, @PathVariable int slotid)
+	public Map<String, Integer> bookSlot(HttpServletRequest request, @PathVariable int slotid)
 	{
-		int bookedSLotId = bookedSlotsService.bookSlot(request, slotid);
+		Map<String, Integer> bookedSLotId = bookedSlotsService.bookSlot(request, slotid);
 		return bookedSLotId;
 	}
 	
 	@RequestMapping(value = "/rescheduleslot", method = RequestMethod.PUT)
-	public int rescheduleBookedSlot(HttpServletRequest request, @RequestBody BookedSlotsRequest bookedSlotsRequest) 
+	public Map<String, Integer> rescheduleBookedSlot(HttpServletRequest request, @RequestBody BookedSlotsRequest bookedSlotsRequest) 
 	{
-		int bookedSlotId = bookedSlotsService.rescheduleBookedSlot(request,bookedSlotsRequest);
+		Map<String, Integer> bookedSlotId = bookedSlotsService.rescheduleBookedSlot(request,bookedSlotsRequest);
 		return bookedSlotId;
 	}
 	
 	@RequestMapping(value = "/deleteslot/{bookedslotid}", method = RequestMethod.DELETE)
-	public String deleteBookedSlot(HttpServletRequest request, @PathVariable int bookedslotid) 
+	public Map<String, Integer> deleteBookedSlot(HttpServletRequest request, @PathVariable int bookedslotid) 
 	{
-		String isDeletedSlot = bookedSlotsService.deleteBookedSlot(request, bookedslotid);
+		Map<String, Integer> isDeletedSlot = bookedSlotsService.deleteBookedSlot(request, bookedslotid);
 		return isDeletedSlot;
 	}
 	
