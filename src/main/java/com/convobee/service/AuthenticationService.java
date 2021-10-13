@@ -1,5 +1,7 @@
 package com.convobee.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -43,7 +45,7 @@ public class AuthenticationService {
 		Users user = usersMapper.mapUserFromRequest(usersRequest);
 		usersService.createUser(user);
 		//Inserting interests in Interests table
-		Interests interests = interestsMapper.mapInterestsFromRequest(user, usersRequest);
+		List<Interests> interests = interestsMapper.mapInterestsFromRequest(user, usersRequest);
 		usersService.createInterestsForUser(interests);
 		final AuthUserDetails userDetails = userDetailsService.loadUserByUsername(user.getMailid());
 		final String jwt = jwtUtil.generateToken(userDetails);
