@@ -2,10 +2,8 @@ package com.convobee.data.entity;
 
 import java.sql.Timestamp;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,8 +25,9 @@ public class Interests {
 	@JoinColumn(name = "user_id")
 	@NotNull
 	private Users user;
-	@ManyToOne(cascade=CascadeType.ALL)
+	@ManyToOne//(cascade=CascadeType.ALL)
 	@JoinColumn(name = "interest_names")
+	@NotNull
 	private InterestsNames interest;
 	@NotNull
 	private Timestamp createdat;
