@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.convobee.api.rest.request.SlotsRequest;
 import com.convobee.data.entity.Slots;
 import com.convobee.data.repository.SlotsRepo;
+import com.convobee.utils.CommonUtil;
 import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.SlotUtil;
 
@@ -59,7 +60,7 @@ public class SlotsService {
 			sdfs.setTimeZone(TimeZone.getTimeZone("UTC"));
 			//System.out.println(sdfs.format(new Date(dif)));
 			slot.setSlottime(Timestamp.valueOf(sdfs.format(new Date(dif))));
-			slot.setSloturl(SlotUtil.getRandomSlotUrl());//Generating slots
+			slot.setSloturl(CommonUtil.getRandomUrl());//Generating slots
 			slot.setCreatedat(Timestamp.valueOf("2020-01-01 19:30:00"));
 			slotsList.add(slot);
 			dif += 3600000/2;

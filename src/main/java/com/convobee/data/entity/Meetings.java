@@ -28,16 +28,17 @@ public class Meetings {
 	@ManyToOne
 	@JoinColumn(name = "user_a_id")
 	@NotNull
-	private Users user_a_id;
+	private Users useraid;
 	@ManyToOne
 	@JoinColumn(name = "user_b_id")
 	@NotNull
-	private Users user_b_id;
+	private Users userbid;
 	@Column(name = "meeting_url", length = 255)
 	@NotNull
 	private String meetingurl;
+	@Column(name = "meeting_status")
 	@NotNull
-	private boolean meeting_status;
+	private String meetingstatus;
 	@Column(name  = "started_at")
 	@NotNull
 	private Timestamp startedat;
