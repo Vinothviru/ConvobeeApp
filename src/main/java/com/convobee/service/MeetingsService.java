@@ -58,24 +58,29 @@ public class MeetingsService {
 	{ 
 		//Need to make this dynamic intead of hardcoding
 		//listOfUserIds.add(userUtil.getLoggedInUserId(request));
-		listOfUserIds.add(4512);
 		listOfUserIds.add(3047);
+		listOfUserIds.add(4512);
 		listOfUserIds.add(4499);
-		listOfUserIds.add(3051);
 		listOfUserIds.add(4505);
 		listOfUserIds.add(4540);
 		listOfUserIds.add(4510);
 		listOfUserIds.add(4548);
 		listOfUserIds.add(4581);
+		listOfUserIds.add(3051);
+		listOfUserIds.add(4690);
 		
 		return initiateMeeting(meetingsRequest);
 	}
 	/*
-	 * TO DO
+	 * Covered cases are below
 	 * Check with more than 2 entries - Done
 	 * Handle if no others interest is matched for a user - Done
 	 * Need to return what interest that 2 users are matched with - Done
-	 * Follow the points in the google docs
+	 * Follow the points in the google docs - Done
+	 * 
+	 * TO DO
+	 * Low priority, not going to make big deal -  Need to do optimisation by removing the elements by un commenting the below lines else more iterations will happen(search this whole string to find the place) 
+	 * Need to check whether the requesting user and the data after retrieval's user id is same 
 	 * */
 	
 	//public Map<LinkedList<Integer>, String> initiateMeeting() {
@@ -97,7 +102,9 @@ public class MeetingsService {
 			List<String> list1 = listOfUserInterests.get(i);
 			for(int j=i+1; j<sizeOfInterestsList;j++) {
 				List<String> list2 = listOfUserInterests.get(j);
-				
+				System.out.println("list1 = " + list1);
+				System.out.println("list2 = " + list2);
+				System.out.println();
 				/* Comparing 2 lists and finding out the similar interests between them */
 				List<String> afterCompare = list1.stream().filter(list2::contains).collect(Collectors.toList());
 				
@@ -158,7 +165,7 @@ public class MeetingsService {
 					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), mismatchUser.get(0), mismatchUser.get(1), meetingUrl, null, listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(1)))));
 					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), mismatchUser.get(1), mismatchUser.get(0), meetingUrl, null, listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(0)))));
 					
-					/* Need to do optimisation by removing the elements by un commenting the below lines else more iterations will happen */
+					/* Very low priority - Need to do optimisation by removing the elements by un commenting the below lines else more iterations will happen */
 					
 					//listOfUserInterests.remove(listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(0))));
 					//listOfUserInterests.remove(listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(1))));
