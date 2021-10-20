@@ -40,15 +40,20 @@ public class MeetingsService {
 	{
 		//Need to make this dynamic intead of hardcoding
 		//listOfUserIds.add(userUtil.getLoggedInUserId(request));
+		listOfUserIds.add(4512);
 		listOfUserIds.add(3047);
+		listOfUserIds.add(4499);
 		listOfUserIds.add(3051);
+		listOfUserIds.add(4505);
+		listOfUserIds.add(4510);
 		return initiateMeeting();
 	}
 	/*
 	 * TO DO
-	 * Check with more than 2 entries
+	 * Check with more than 2 entries - Done
 	 * Handle if no others interest is matched for a user
 	 * Need to return what interest that 2 users are matched with
+	 * Follow the points in the google docs
 	 * */
 	
 	public Map<LinkedList<Integer>, String> initiateMeeting() {
@@ -61,7 +66,9 @@ public class MeetingsService {
 			listOfUserInterests.add(interestsRepo.findInterestByUser(listOfUserIds.get(i)));
 		}
 		int sizeOfInterestsList = listOfUserInterests.size();
+		LinkedList<Integer> mismatchUser = new LinkedList<Integer>();
 		for(int i=0; i<sizeOfInterestsList; i++) {
+			int flag = 0;
 			LinkedList<Integer> userVsOppUser = new LinkedList<Integer>();
 			List<String> list1 = listOfUserInterests.get(i);
 			for(int j=i+1; j<sizeOfInterestsList;j++) {
@@ -84,15 +91,35 @@ public class MeetingsService {
 					int user_a_id = listOfUsers.get(i);
 					int user_b_id = listOfUsers.get(j);
 					Meetings meeting = meetingsMapper.mapMeetings(user_a_id, user_b_id, meetingUrl);
-					meetingsRepo.save(meeting);
+					meetingsRepo.save(meeting);//Persisting into Meetings table
 					listOfUserInterests.remove(list1);
 					listOfUserInterests.remove(list2);
 					listOfUsers.remove(Integer.valueOf(user_a_id));
 					listOfUsers.remove(Integer.valueOf(user_b_id));
 					sizeOfInterestsList = listOfUserInterests.size();
+					i--;
+					flag = 1;
+					break;
 				}
 			}
-
+			
+			/* Handling unmatched users */
+			if(mismatchUser.size()<2 && flag == 0)
+			{
+				mismatchUser.add(listOfUsers.get(i));
+				if(mismatchUser.size()==2)
+				{
+					String meetingUrl = CommonUtil.getRandomUrl();
+					LinkedList<Integer> firstEntry = new LinkedList<Integer>(mismatchUser);
+					userVsInterests.put(firstEntry, meetingUrl);
+					LinkedList<Integer> reverseInteger = new LinkedList<Integer>(mismatchUser);
+					Collections.reverse(reverseInteger);
+					userVsInterests.put(reverseInteger, meetingUrl);//Need to return this to nodejs
+					
+					mismatchUser.removeAll(mismatchUser);//Cleaning up users after mapping
+				}
+			}
+			
 		}
 		listOfUserIds.removeAll(listOfUserIds);
 		return userVsInterests;
