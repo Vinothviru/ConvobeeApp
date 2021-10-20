@@ -17,10 +17,12 @@ import com.convobee.api.rest.response.builder.MeetingResponseBuilder;
 import com.convobee.api.rest.response.builder.VideoCallResponseBuilder;
 import com.convobee.data.entity.BookedSlots;
 import com.convobee.data.entity.Meetings;
+import com.convobee.data.entity.Users;
 import com.convobee.data.mapper.MeetingsMapper;
 import com.convobee.data.repository.BookedSlotsRepo;
 import com.convobee.data.repository.InterestsRepo;
 import com.convobee.data.repository.MeetingsRepo;
+import com.convobee.data.repository.UsersRepo;
 import com.convobee.utils.CommonUtil;
 import com.convobee.utils.UserUtil;
 @Service
@@ -46,6 +48,9 @@ public class MeetingsService {
 	
 	@Autowired
 	BookedSlotsRepo bookedSlotsRepo;
+	
+	@Autowired
+	UsersRepo usersRepo;
 	
 	List<Integer> listOfUserIds = new LinkedList<Integer>();
 	 
@@ -107,6 +112,12 @@ public class MeetingsService {
 					int user_b_id = listOfUsers.get(j);
 					Meetings meeting = meetingsMapper.mapMeetings(user_a_id, user_b_id, meetingUrl, slot.get().getSlots().getSlotid());
 					meetingsRepo.save(meeting);//Persisting into Meetings table
+					Users user_a = usersRepo.getById(user_a_id);
+					Users user_b = usersRepo.getById(user_b_id);
+					user_a.setIsfeedbackgiven(false);
+					user_b.setIsfeedbackgiven(false);
+					usersRepo.save(user_a);
+					usersRepo.save(user_b);
 					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), user_a_id, user_b_id, meetingUrl, afterCompare, list2));
 					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), user_b_id, user_a_id, meetingUrl, afterCompare, list1));
 					listOfUserInterests.remove(list1);
@@ -136,6 +147,13 @@ public class MeetingsService {
 					String meetingUrl = CommonUtil.getRandomUrl();
 					Meetings meeting = meetingsMapper.mapMeetings(mismatchUser.get(0), mismatchUser.get(1), meetingUrl, slot.get().getSlots().getSlotid());
 					meetingsRepo.save(meeting);//Persisting into Meetings table
+					
+					Users user_a = usersRepo.getById(mismatchUser.get(0));
+					Users user_b = usersRepo.getById(mismatchUser.get(1));
+					user_a.setIsfeedbackgiven(false);
+					user_b.setIsfeedbackgiven(false);
+					usersRepo.save(user_a);
+					usersRepo.save(user_b);
 					
 					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), mismatchUser.get(0), mismatchUser.get(1), meetingUrl, null, listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(1)))));
 					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), mismatchUser.get(1), mismatchUser.get(0), meetingUrl, null, listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(0)))));
