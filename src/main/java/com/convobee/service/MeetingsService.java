@@ -72,7 +72,6 @@ public class MeetingsService {
 	//public Map<LinkedList<Integer>, String> initiateMeeting() {
 	public VideoCallResponse initiateMeeting() {
 		List<MeetingResponse> meetingResponseList = new LinkedList<MeetingResponse>();
-		Map<LinkedList<Integer>, String> userVsInterests = new LinkedHashMap<LinkedList<Integer>, String>();
 		List<Integer> listOfUsers = new LinkedList<Integer>();
 		List<LinkedList<String>> listOfUserInterests = new LinkedList<LinkedList<String>>();
 		for(Integer i=0; i<listOfUserIds.size(); i++)
@@ -99,10 +98,6 @@ public class MeetingsService {
 					userVsOppUser.add(listOfUsers.get(i));
 					userVsOppUser.add(listOfUsers.get(j));
 					String meetingUrl = CommonUtil.getRandomUrl();
-					userVsInterests.put(userVsOppUser, meetingUrl);
-					LinkedList<Integer> reverseInteger = new LinkedList<Integer>(userVsOppUser);
-					Collections.reverse(reverseInteger);
-					userVsInterests.put(reverseInteger, meetingUrl);//Need to return this to nodejs
 					int user_a_id = listOfUsers.get(i);
 					int user_b_id = listOfUsers.get(j);
 					Meetings meeting = meetingsMapper.mapMeetings(user_a_id, user_b_id, meetingUrl);
@@ -146,12 +141,6 @@ public class MeetingsService {
 					//listOfUsers.remove(Integer.valueOf(mismatchUser.get(1)));
 					//sizeOfInterestsList = listOfUserInterests.size();
 					//i--;
-					
-					LinkedList<Integer> firstEntry = new LinkedList<Integer>(mismatchUser);
-					userVsInterests.put(firstEntry, meetingUrl);
-					LinkedList<Integer> reverseInteger = new LinkedList<Integer>(mismatchUser);
-					Collections.reverse(reverseInteger);
-					userVsInterests.put(reverseInteger, meetingUrl);//Need to return this to nodejs
 					
 					mismatchUser.removeAll(mismatchUser);//Cleaning up users after mapping
 				}
