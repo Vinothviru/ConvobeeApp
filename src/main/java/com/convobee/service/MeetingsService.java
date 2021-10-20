@@ -1,10 +1,8 @@
 package com.convobee.service;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,12 +10,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.convobee.api.rest.request.MeetingsRequest;
 import com.convobee.api.rest.response.MeetingResponse;
 import com.convobee.api.rest.response.VideoCallResponse;
 import com.convobee.api.rest.response.builder.MeetingResponseBuilder;
 import com.convobee.api.rest.response.builder.VideoCallResponseBuilder;
+import com.convobee.data.entity.BookedSlots;
 import com.convobee.data.entity.Meetings;
 import com.convobee.data.mapper.MeetingsMapper;
+import com.convobee.data.repository.BookedSlotsRepo;
 import com.convobee.data.repository.InterestsRepo;
 import com.convobee.data.repository.MeetingsRepo;
 import com.convobee.utils.CommonUtil;
@@ -43,9 +44,12 @@ public class MeetingsService {
 	@Autowired
 	VideoCallResponseBuilder videoCallResponseBuilder;
 	
+	@Autowired
+	BookedSlotsRepo bookedSlotsRepo;
+	
 	List<Integer> listOfUserIds = new LinkedList<Integer>();
 	 
-	public VideoCallResponse addActiveUsers(HttpServletRequest request)
+	public VideoCallResponse addActiveUsers(HttpServletRequest request, MeetingsRequest meetingsRequest)
 	{ 
 		//Need to make this dynamic intead of hardcoding
 		//listOfUserIds.add(userUtil.getLoggedInUserId(request));
@@ -59,7 +63,7 @@ public class MeetingsService {
 		listOfUserIds.add(4548);
 		listOfUserIds.add(4581);
 		
-		return initiateMeeting();
+		return initiateMeeting(meetingsRequest);
 	}
 	/*
 	 * TO DO
@@ -70,7 +74,8 @@ public class MeetingsService {
 	 * */
 	
 	//public Map<LinkedList<Integer>, String> initiateMeeting() {
-	public VideoCallResponse initiateMeeting() {
+	public VideoCallResponse initiateMeeting(MeetingsRequest meetingsRequest) {
+		Optional<BookedSlots> slot = bookedSlotsRepo.findById(meetingsRequest.getBookedSlotId());
 		List<MeetingResponse> meetingResponseList = new LinkedList<MeetingResponse>();
 		List<Integer> listOfUsers = new LinkedList<Integer>();
 		List<LinkedList<String>> listOfUserInterests = new LinkedList<LinkedList<String>>();
@@ -100,7 +105,7 @@ public class MeetingsService {
 					String meetingUrl = CommonUtil.getRandomUrl();
 					int user_a_id = listOfUsers.get(i);
 					int user_b_id = listOfUsers.get(j);
-					Meetings meeting = meetingsMapper.mapMeetings(user_a_id, user_b_id, meetingUrl);
+					Meetings meeting = meetingsMapper.mapMeetings(user_a_id, user_b_id, meetingUrl, slot.get().getSlots().getSlotid());
 					meetingsRepo.save(meeting);//Persisting into Meetings table
 					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), user_a_id, user_b_id, meetingUrl, afterCompare, list2));
 					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), user_b_id, user_a_id, meetingUrl, afterCompare, list1));
@@ -129,7 +134,7 @@ public class MeetingsService {
 				if(mismatchUser.size()==2)
 				{
 					String meetingUrl = CommonUtil.getRandomUrl();
-					Meetings meeting = meetingsMapper.mapMeetings(mismatchUser.get(0), mismatchUser.get(1), meetingUrl);
+					Meetings meeting = meetingsMapper.mapMeetings(mismatchUser.get(0), mismatchUser.get(1), meetingUrl, slot.get().getSlots().getSlotid());
 					meetingsRepo.save(meeting);//Persisting into Meetings table
 					
 					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), mismatchUser.get(0), mismatchUser.get(1), meetingUrl, null, listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(1)))));

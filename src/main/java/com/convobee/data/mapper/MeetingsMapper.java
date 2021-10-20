@@ -11,14 +11,14 @@ import com.convobee.data.entity.Users;
 
 @Service
 public class MeetingsMapper {
-	public Meetings mapMeetings(int useraid, int userbid, String meetingurl) {
+	public Meetings mapMeetings(int useraid, int userbid, String meetingurl, int slotId) {
 		Meetings meetings = new Meetings();
 		Users user_a = new Users();
 		user_a.setUserid(useraid);
 		Users user_b = new Users();
 		user_b.setUserid(userbid);
 		Slots slot = new Slots();
-		slot.setSlotid(5);
+		slot.setSlotid(slotId);
 		meetings.setSlots(slot);
 		meetings.setUseraid(user_a);
 		meetings.setUserbid(user_b);
