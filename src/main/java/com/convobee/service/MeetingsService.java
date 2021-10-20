@@ -13,14 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.convobee.api.rest.response.MeetingResponse;
+import com.convobee.api.rest.response.VideoCallResponse;
 import com.convobee.api.rest.response.builder.MeetingResponseBuilder;
+import com.convobee.api.rest.response.builder.VideoCallResponseBuilder;
 import com.convobee.data.entity.Meetings;
 import com.convobee.data.mapper.MeetingsMapper;
 import com.convobee.data.repository.InterestsRepo;
 import com.convobee.data.repository.MeetingsRepo;
 import com.convobee.utils.CommonUtil;
 import com.convobee.utils.UserUtil;
-
 @Service
 public class MeetingsService {
 
@@ -39,10 +40,13 @@ public class MeetingsService {
 	@Autowired
 	MeetingResponseBuilder meetingResponseBuilder;
 	
+	@Autowired
+	VideoCallResponseBuilder videoCallResponseBuilder;
+	
 	List<Integer> listOfUserIds = new LinkedList<Integer>();
 	 
-	public List<MeetingResponse> addActiveUsers(HttpServletRequest request)
-	{
+	public VideoCallResponse addActiveUsers(HttpServletRequest request)
+	{ 
 		//Need to make this dynamic intead of hardcoding
 		//listOfUserIds.add(userUtil.getLoggedInUserId(request));
 		listOfUserIds.add(4512);
@@ -53,6 +57,7 @@ public class MeetingsService {
 		listOfUserIds.add(4540);
 		listOfUserIds.add(4510);
 		listOfUserIds.add(4548);
+		listOfUserIds.add(4581);
 		
 		return initiateMeeting();
 	}
@@ -65,7 +70,7 @@ public class MeetingsService {
 	 * */
 	
 	//public Map<LinkedList<Integer>, String> initiateMeeting() {
-	public List<MeetingResponse> initiateMeeting() {
+	public VideoCallResponse initiateMeeting() {
 		List<MeetingResponse> meetingResponseList = new LinkedList<MeetingResponse>();
 		Map<LinkedList<Integer>, String> userVsInterests = new LinkedHashMap<LinkedList<Integer>, String>();
 		List<Integer> listOfUsers = new LinkedList<Integer>();
@@ -154,7 +159,18 @@ public class MeetingsService {
 			
 		}
 		listOfUserIds.removeAll(listOfUserIds);
-		return meetingResponseList;
+		MeetingResponse.UnmatchedMeetingResponse unmatchedUser = new MeetingResponse.UnmatchedMeetingResponse();
+		if(mismatchUser.size()!=0)
+		{
+//			unmatchedUser.setUnMatchedUserId(null);
+//			return   videoCallResponseBuilder.buildResponse(meetingResponseList, unmatchedUser);
+//		}
+//		else
+//		{
+			unmatchedUser.setUnMatchedUserId(mismatchUser.get(0));
+			
+		}
+		return   videoCallResponseBuilder.buildResponse(meetingResponseList, unmatchedUser);
 	}
 
 

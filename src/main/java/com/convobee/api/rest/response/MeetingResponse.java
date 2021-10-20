@@ -14,4 +14,9 @@ public class MeetingResponse {
 	private String meetingUrl;
 	private List<String> oppositeUserMatchedInterest;
 	private List<String> oppositeUserUnmatchedInterest;
+	
+	@Data
+	public static class UnmatchedMeetingResponse {
+		private Integer unMatchedUserId;
+	}
 }
