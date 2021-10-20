@@ -65,7 +65,7 @@ public class MeetingsService {
 	 * TO DO
 	 * Check with more than 2 entries - Done
 	 * Handle if no others interest is matched for a user - Done
-	 * Need to return what interest that 2 users are matched with
+	 * Need to return what interest that 2 users are matched with - Done
 	 * Follow the points in the google docs
 	 * */
 	
@@ -107,8 +107,8 @@ public class MeetingsService {
 					int user_b_id = listOfUsers.get(j);
 					Meetings meeting = meetingsMapper.mapMeetings(user_a_id, user_b_id, meetingUrl);
 					meetingsRepo.save(meeting);//Persisting into Meetings table
-					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), user_a_id, user_b_id, meetingUrl, afterCompare, afterCompare));
-					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), user_b_id, user_a_id, meetingUrl, afterCompare, afterCompare));
+					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), user_a_id, user_b_id, meetingUrl, afterCompare, list2));
+					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), user_b_id, user_a_id, meetingUrl, afterCompare, list1));
 					listOfUserInterests.remove(list1);
 					listOfUserInterests.remove(list2);
 					listOfUsers.remove(Integer.valueOf(user_a_id));
@@ -162,15 +162,9 @@ public class MeetingsService {
 		MeetingResponse.UnmatchedMeetingResponse unmatchedUser = new MeetingResponse.UnmatchedMeetingResponse();
 		if(mismatchUser.size()!=0)
 		{
-//			unmatchedUser.setUnMatchedUserId(null);
-//			return   videoCallResponseBuilder.buildResponse(meetingResponseList, unmatchedUser);
-//		}
-//		else
-//		{
 			unmatchedUser.setUnMatchedUserId(mismatchUser.get(0));
-			
 		}
-		return   videoCallResponseBuilder.buildResponse(meetingResponseList, unmatchedUser);
+		return videoCallResponseBuilder.buildResponse(meetingResponseList, unmatchedUser);
 	}
 
 

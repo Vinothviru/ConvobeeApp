@@ -17,7 +17,7 @@ public class MeetingResponseBuilder {
 														.oppositeUserId(oppositeUserId)
 														.meetingUrl(meetingUrl)
 														.oppositeUserMatchedInterest(oppositeUserMatchedInterest)
-														.oppositeUserUnmatchedInterest(oppositeUserUnmatchedInterest).build();
+														.oppositeUserInterests(oppositeUserUnmatchedInterest).build();
 		return meetingResponse;
 	}
 }

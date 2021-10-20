@@ -13,7 +13,7 @@ public class MeetingResponse {
 	private int oppositeUserId;
 	private String meetingUrl;
 	private List<String> oppositeUserMatchedInterest;
-	private List<String> oppositeUserUnmatchedInterest;
+	private List<String> oppositeUserInterests;
 	
 	@Data
 	public static class UnmatchedMeetingResponse {
