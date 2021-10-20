@@ -46,6 +46,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 		.antMatchers("/deleteslot").hasAnyRole("USER","ADMIN")
 		.antMatchers("/getupcomingsessions").hasAnyRole("USER","ADMIN")
 		.antMatchers("/initiatemeeting").hasAnyRole("USER","ADMIN")
+		.antMatchers("/changestatusofmeeting").hasAnyRole("USER","ADMIN")
 		.antMatchers("/admin").hasRole("ADMIN")
 		.antMatchers("/hello").hasAnyRole("USER","ADMIN")
 		.antMatchers("/signup").permitAll()

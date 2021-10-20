@@ -17,9 +17,19 @@ public class VideoCallAPI {
 
 	@Autowired
 	MeetingsService meetingsService;
+	
 	@RequestMapping(value = "/initiatemeeting", method = RequestMethod.POST)
 	public VideoCallResponse initiateMeeting(HttpServletRequest request, @ModelAttribute MeetingsRequest meetingsRequest)
 	{
 		return meetingsService.addActiveUsers(request, meetingsRequest);
 	}
+	
+	@RequestMapping(value = "/changestatusofmeeting", method = RequestMethod.PUT)
+	public String changeStatusOfMeeting(@ModelAttribute MeetingsRequest meetingsRequest)
+	{
+		meetingsService.changeStatusOfMeeting(meetingsRequest);
+		return "OK";
+	}
+	
+	
 }

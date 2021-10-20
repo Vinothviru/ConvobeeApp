@@ -158,6 +158,8 @@ public class MeetingsService {
 					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), mismatchUser.get(0), mismatchUser.get(1), meetingUrl, null, listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(1)))));
 					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), mismatchUser.get(1), mismatchUser.get(0), meetingUrl, null, listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(0)))));
 					
+					/* Need to do optimisation by removing the elements by un commenting the below lines else more iterations will happen */
+					
 					//listOfUserInterests.remove(listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(0))));
 					//listOfUserInterests.remove(listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(1))));
 					//listOfUsers.remove(Integer.valueOf(mismatchUser.get(0)));
@@ -179,5 +181,10 @@ public class MeetingsService {
 		return videoCallResponseBuilder.buildResponse(meetingResponseList, unmatchedUser);
 	}
 
-
+	public String changeStatusOfMeeting(MeetingsRequest meetingsRequest) {
+		Meetings meeting = meetingsRepo.getById(meetingsRequest.getMeetingId());
+		meeting.setMeetingstatus(meetingsRequest.getStatus());
+		meetingsRepo.save(meeting);
+		return "OK";
+	}
 }

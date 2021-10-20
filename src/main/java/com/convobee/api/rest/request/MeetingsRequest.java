@@ -6,5 +6,6 @@ import lombok.Data;
 public class MeetingsRequest {
 
 	private int bookedSlotId;
-	
+	private int meetingId;
+	private String status;
 }
