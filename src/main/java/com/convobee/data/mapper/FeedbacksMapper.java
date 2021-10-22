@@ -4,8 +4,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,16 +13,12 @@ import com.convobee.data.entity.Meetings;
 import com.convobee.data.entity.Users;
 import com.convobee.data.repository.FeedbacksRepo;
 import com.convobee.data.repository.MeetingsRepo;
-import com.convobee.utils.UserUtil;
 
 @Service
 public class FeedbacksMapper {
 	
 	@Autowired
 	MeetingsRepo meetingsRepo;
-	
-	@Autowired
-	UserUtil userUtil;
 	
 	@Autowired
 	FeedbacksRepo feedbacksRepo;

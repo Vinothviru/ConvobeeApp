@@ -8,10 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.convobee.api.rest.request.FeedbacksRequest;
+import com.convobee.api.rest.request.FeedbacksToUsRequest;
 import com.convobee.data.entity.Feedbacks;
+import com.convobee.data.entity.FeedbacksToUs;
 import com.convobee.data.entity.Users;
 import com.convobee.data.mapper.FeedbacksMapper;
+import com.convobee.data.mapper.FeedbacksToUsMapper;
 import com.convobee.data.repository.FeedbacksRepo;
+import com.convobee.data.repository.FeedbacksToUsRepo;
 import com.convobee.data.repository.UsersRepo;
 import com.convobee.utils.UserUtil;
 
@@ -22,7 +26,13 @@ public class FeedbacksService {
 	FeedbacksMapper feedbacksMapper;
 	
 	@Autowired
+	FeedbacksToUsMapper feedbacksToUsMapper;
+	
+	@Autowired
 	FeedbacksRepo feedbacksRepo;
+	
+	@Autowired
+	FeedbacksToUsRepo feedbacksToUsRepo;
 	
 	@Autowired
 	UsersRepo usersRepo;
@@ -38,5 +48,11 @@ public class FeedbacksService {
 		Optional<Users> user = usersRepo.findById(currentUserId);
 		user.get().setIsfeedbackgiven(true);
 		usersRepo.save(user.get());
+	}
+	
+	public void submitFeedbackToUs(HttpServletRequest request, FeedbacksToUsRequest feedbacksToUsRequest) {
+		int currentUserId = userUtil.getLoggedInUserId(request);
+		FeedbacksToUs feedbacksToUs = feedbacksToUsMapper.mapFeedbacksToUs(feedbacksToUsRequest, currentUserId);
+		feedbacksToUsRepo.save(feedbacksToUs);
 	}
 }

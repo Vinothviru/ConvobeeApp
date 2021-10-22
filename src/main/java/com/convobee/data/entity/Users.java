@@ -57,6 +57,9 @@ public class Users {
 	@Column(name = "is_feedback_given")
 	@NotNull
 	private boolean isfeedbackgiven;
+	@Column(name = "is_user_banned")
+	@NotNull
+	private boolean isuserbanned;
 	@Column(name = "created_at")
 	@NotNull
 	private Timestamp createdat;
