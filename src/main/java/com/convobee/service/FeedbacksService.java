@@ -32,7 +32,7 @@ public class FeedbacksService {
 	
 	public void submitFeedback(HttpServletRequest request, FeedbacksRequest feedbacksRequest) {
 		int currentUserId = userUtil.getLoggedInUserId(request);
-		Feedbacks feedback = feedbacksMapper.mapFeedbacks(request, feedbacksRequest, currentUserId);
+		Feedbacks feedback = feedbacksMapper.mapFeedbacks(feedbacksRequest, currentUserId);
 		feedbacksRepo.save(feedback);
 		/* After providing feedback, corresponding user's is_feedback_given status column will be changed to true */
 		Optional<Users> user = usersRepo.findById(currentUserId);

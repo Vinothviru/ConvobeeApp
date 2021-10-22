@@ -1,6 +1,7 @@
 package com.convobee.data.mapper;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import com.convobee.api.rest.request.FeedbacksRequest;
 import com.convobee.data.entity.Feedbacks;
 import com.convobee.data.entity.Meetings;
 import com.convobee.data.entity.Users;
+import com.convobee.data.repository.FeedbacksRepo;
 import com.convobee.data.repository.MeetingsRepo;
 import com.convobee.utils.UserUtil;
 
@@ -24,9 +26,30 @@ public class FeedbacksMapper {
 	@Autowired
 	UserUtil userUtil;
 	
-	public Feedbacks mapFeedbacks(HttpServletRequest request, FeedbacksRequest feedbacksRequest, int currentUserId) {
-		Feedbacks feedback = new Feedbacks();
+	@Autowired
+	FeedbacksRepo feedbacksRepo;
+	
+	public Feedbacks mapFeedbacks(FeedbacksRequest feedbacksRequest, int currentUserId) {
 		int meetingId = feedbacksRequest.getMeetingId();
+		
+		/* Checking whether the user is already provided the feedback for particular meeting and if yes, not allowing to do the same */
+		
+		List<Feedbacks> fb = feedbacksRepo.findByMeetingid(meetingId);
+		if(!fb.isEmpty()) {
+			if(fb.get(0).getProvideruser().getUserid() == currentUserId)
+			{
+				System.out.println("Already kuduthutiye da dei :joy:");
+				return null;
+			}
+			else if(fb.size()>1) {
+				System.out.println("Epdiyo kuduthurpa ilena vera edho oru user indha data va access pana try panran");
+				return null;
+			}
+		}
+
+		/* Actual mapping starts here */
+		
+		Feedbacks feedback = new Feedbacks();
 		Optional<Meetings> meeting = meetingsRepo.findById(meetingId);
 		int loggedinUserId = currentUserId;
 		int providerUserId = 0;
