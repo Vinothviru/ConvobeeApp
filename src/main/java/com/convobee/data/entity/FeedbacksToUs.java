@@ -34,7 +34,6 @@ public class FeedbacksToUs {
 	private boolean reportuser;
 	@ManyToOne
 	@JoinColumn(name = "reportee_user_id")
-	@NotNull
 	private Users reporteeuser; 
 	@Column(name = "report_type", length = 20)
 	private String reporttype;

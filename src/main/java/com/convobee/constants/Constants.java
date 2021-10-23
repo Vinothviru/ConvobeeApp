@@ -18,5 +18,11 @@ public class Constants {
     public  static  final String DANCE = "Dance";
     public  static  final String TECHNOLOGY = "Technology";
     /*Interests constants ends here*/
+    
+    /* Meeting status constants starts here */
+    public  static  final String INITIATED = "Initiated";
+    public  static  final String STARTED = "Started";
+    public  static  final String COMPLETED = "Completed";
+    /* Meeting status constants ends here */
 }
 

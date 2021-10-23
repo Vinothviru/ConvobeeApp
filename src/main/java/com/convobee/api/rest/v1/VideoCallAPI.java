@@ -1,35 +1,35 @@
 package com.convobee.api.rest.v1;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.convobee.utils.UserUtil;
+import com.convobee.api.rest.request.MeetingsRequest;
+import com.convobee.api.rest.response.VideoCallResponse;
+import com.convobee.service.MeetingsService;
 
 @RestController
 public class VideoCallAPI {
 
 	@Autowired
-	UserUtil userUtil;
+	MeetingsService meetingsService;
 	
-	List<Integer> listOfUserIds = new LinkedList<Integer>();
-	@RequestMapping(value = "/initiatemeeting", method = RequestMethod.GET)
-	public List<Integer> initiateMeeting(HttpServletRequest request)
+	@RequestMapping(value = "/initiatemeeting", method = RequestMethod.POST)
+	public VideoCallResponse initiateMeeting(HttpServletRequest request, @ModelAttribute MeetingsRequest meetingsRequest)
 	{
-		//listOfUserIds.add(userUtil.getLoggedInUserId(request));
-		listOfUserIds.add(1);
-		listOfUserIds.add(3);
-		listOfUserIds.add(2898);
-		listOfUserIds.add(2917);
-		listOfUserIds.add(2931);
-		
-		System.out.println("First = " + listOfUserIds);
-		return listOfUserIds;
+		return meetingsService.addActiveUsers(request, meetingsRequest);
 	}
+	
+	@RequestMapping(value = "/changestatusofmeeting", method = RequestMethod.PUT)
+	public String changeStatusOfMeeting(@ModelAttribute MeetingsRequest meetingsRequest)
+	{
+		meetingsService.changeStatusOfMeeting(meetingsRequest);
+		return "OK";
+	}
+	
+	
 }

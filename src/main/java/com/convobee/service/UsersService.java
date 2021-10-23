@@ -1,5 +1,7 @@
 package com.convobee.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +24,9 @@ public class UsersService {
 		usersRepo.save(user);
 	}
 	
-	public void createInterestsForUser(Interests interests) throws Exception
+	public void createInterestsForUser(List<Interests> interests) throws Exception
 	{
-		interestsRepo.save(interests);
+		interestsRepo.saveAll(interests);
 	}
 	
 }
