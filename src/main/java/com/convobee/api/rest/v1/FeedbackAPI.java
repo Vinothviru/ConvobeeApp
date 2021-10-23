@@ -1,5 +1,7 @@
 package com.convobee.api.rest.v1;
 
+import java.util.LinkedList;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.convobee.api.rest.request.FeedbacksRequest;
 import com.convobee.api.rest.request.FeedbacksToUsRequest;
+import com.convobee.api.rest.response.FeedbackHistoryResponse;
 import com.convobee.service.FeedbacksService;
 
 @RestController
@@ -28,5 +31,11 @@ public class FeedbackAPI {
 	public String submitFeedbackToUs(HttpServletRequest request, @RequestBody FeedbacksToUsRequest feedbacksToUsRequest) throws Exception{
 		feedbacksService.submitFeedbackToUs(request, feedbacksToUsRequest);
 		return "OK";
+	}
+	
+	@RequestMapping(value = "/getfeedbackhistory", method = RequestMethod.GET)
+	public LinkedList<FeedbackHistoryResponse> getFeedbackHistory(HttpServletRequest request) throws Exception{
+		return feedbacksService.getFeedbackHistory(request);
+		
 	}
 }
