@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.convobee.api.rest.request.FeedbacksRequest;
 import com.convobee.api.rest.request.FeedbacksToUsRequest;
+import com.convobee.api.rest.request.ViewFeedbackRequest;
 import com.convobee.api.rest.response.FeedbackHistoryResponse;
+import com.convobee.api.rest.response.ViewFeedbackResponse;
 import com.convobee.service.FeedbacksService;
 
 @RestController
@@ -36,6 +39,10 @@ public class FeedbackAPI {
 	@RequestMapping(value = "/getfeedbackhistory", method = RequestMethod.GET)
 	public LinkedList<FeedbackHistoryResponse> getFeedbackHistory(HttpServletRequest request) throws Exception{
 		return feedbacksService.getFeedbackHistory(request);
-		
+	}
+	
+	@RequestMapping(value = "/viewfeedback", method = RequestMethod.GET)
+	public ViewFeedbackResponse viewFeedback(HttpServletRequest request, @ModelAttribute ViewFeedbackRequest viewFeedbackRequest) throws Exception{
+		return feedbacksService.viewFeedback(request, viewFeedbackRequest);
 	}
 }

@@ -1,6 +1,5 @@
 package com.convobee.service;
 
-import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -11,7 +10,10 @@ import org.springframework.stereotype.Service;
 
 import com.convobee.api.rest.request.FeedbacksRequest;
 import com.convobee.api.rest.request.FeedbacksToUsRequest;
+import com.convobee.api.rest.request.ViewFeedbackRequest;
 import com.convobee.api.rest.response.FeedbackHistoryResponse;
+import com.convobee.api.rest.response.ViewFeedbackResponse;
+import com.convobee.api.rest.response.builder.ViewFeedbackResponseBuilder;
 import com.convobee.data.entity.Feedbacks;
 import com.convobee.data.entity.FeedbacksToUs;
 import com.convobee.data.entity.Users;
@@ -42,6 +44,9 @@ public class FeedbacksService {
 	
 	@Autowired
 	UserUtil userUtil;
+	
+	@Autowired
+	ViewFeedbackResponseBuilder viewFeedbackResponseBuilder;
 	
 	public void submitFeedback(HttpServletRequest request, FeedbacksRequest feedbacksRequest) {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
@@ -74,5 +79,23 @@ public class FeedbacksService {
 			feedbackHistoryResponse.add(feedbackHistory);
 		}
 		return feedbackHistoryResponse;
+	}
+	
+	public ViewFeedbackResponse viewFeedback(HttpServletRequest request, ViewFeedbackRequest viewFeedbackRequest) throws Exception {
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		Feedbacks feedback = feedbacksRepo.findById(viewFeedbackRequest.getFeedbackId()).get();
+		int feedbackReceiverUserId = feedback.getReceiveruser().getUserid();
+		/* Checking whether the logged in user accessing his data or not */
+		if(loggedinUserId == feedbackReceiverUserId)
+		{
+			ViewFeedbackResponse viewFeedbackResponse = viewFeedbackResponseBuilder.buildResponse(feedback.getProficiencylevel(), feedback.getConfidencelevel(), 
+										feedback.getImpressionlevel(), feedback.getAppreciatefeedback(), feedback.getAdvisefeedback());
+			return viewFeedbackResponse;
+		}
+		else
+		{
+			System.out.println("Inoruthan data va access pandriya da body soda");
+			return null;
+		}
 	}
 }
