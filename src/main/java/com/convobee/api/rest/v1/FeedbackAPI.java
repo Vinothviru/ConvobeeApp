@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.convobee.api.rest.request.FeedbacksRequest;
 import com.convobee.api.rest.request.FeedbacksToUsRequest;
 import com.convobee.api.rest.request.ViewFeedbackRequest;
+import com.convobee.api.rest.response.DashboardPieChatResponse;
 import com.convobee.api.rest.response.FeedbackHistoryResponse;
+import com.convobee.api.rest.response.InvalidPieChartResponse;
 import com.convobee.api.rest.response.ViewFeedbackResponse;
 import com.convobee.service.FeedbacksService;
 
@@ -44,5 +46,15 @@ public class FeedbackAPI {
 	@RequestMapping(value = "/viewfeedback", method = RequestMethod.GET)
 	public ViewFeedbackResponse viewFeedback(HttpServletRequest request, @ModelAttribute ViewFeedbackRequest viewFeedbackRequest) throws Exception{
 		return feedbacksService.viewFeedback(request, viewFeedbackRequest);
+	}
+	
+	@RequestMapping(value = "/getpiechart", method = RequestMethod.GET)
+	public DashboardPieChatResponse getPieChart(HttpServletRequest request) throws Exception{
+		return feedbacksService.getPieChart(request);
+	}
+	
+	@RequestMapping(value = "/getpiechartinvalid", method = RequestMethod.GET)
+	public InvalidPieChartResponse getPieChartInvalid(HttpServletRequest request) throws Exception{
+		return feedbacksService.getPieChartInvalid(request);
 	}
 }

@@ -1,9 +1,11 @@
 package com.convobee.utils;
 
+import java.text.DecimalFormat;
 import java.util.Random;
 
 public class CommonUtil {
 
+	/* Generates random URL */
 	public static String getRandomUrl()
 	{ 
 			int leftLimit = 97; // letter 'a'
@@ -19,5 +21,13 @@ public class CommonUtil {
 			return randomUrl;
 			//System.out.println(new StringBuilder().append("https://www.convobee.com/").append(generatedString));			
 	}
-
+	
+	/* Calculates percentage w.r.t obtained value and total value */
+	public static double calculatePercentage(double obtained, double total)
+	{
+		double result = (obtained/total)*100;
+		DecimalFormat df = new DecimalFormat("#.##");      
+		result = Double.valueOf(df.format(result));
+		return result; 
+	}
 }
