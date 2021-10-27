@@ -1,5 +1,6 @@
 package com.convobee.service;
 
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -13,8 +14,10 @@ import com.convobee.api.rest.request.FeedbacksToUsRequest;
 import com.convobee.api.rest.request.ViewFeedbackRequest;
 import com.convobee.api.rest.response.DashboardPieChatResponse;
 import com.convobee.api.rest.response.FeedbackHistoryResponse;
+import com.convobee.api.rest.response.GraphLineChartResponse;
 import com.convobee.api.rest.response.InvalidPieChartResponse;
 import com.convobee.api.rest.response.ViewFeedbackResponse;
+import com.convobee.api.rest.response.builder.GraphLineChartResponseBuilder;
 import com.convobee.api.rest.response.builder.InvalidPieChartResponseBuilder;
 import com.convobee.api.rest.response.builder.PieChartResponseBuilder;
 import com.convobee.api.rest.response.builder.ViewFeedbackResponseBuilder;
@@ -55,6 +58,9 @@ public class FeedbacksService {
 	
 	@Autowired
 	PieChartResponseBuilder pieChartResponseBuilder;
+	
+	@Autowired
+	GraphLineChartResponseBuilder graphLineChartResponseBuilder;
 	
 	@Autowired
 	InvalidPieChartResponseBuilder invalidPieChartResponseBuilder;
@@ -164,6 +170,134 @@ public class FeedbacksService {
 			pieChartResponseList.setImpressionLevel(pieChartResponseBuilder.buildImpressionResponse(oneStar, twoStar, threeStar, fourStar, fiveStar));
 		}
 		return pieChartResponseList;
+	}
+	
+	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
+	public GraphLineChartResponse getGraphLineChart(HttpServletRequest request) throws Exception {
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		String startDate = "2021-10-01 00:00:00";
+		String endDate = "2021-10-31 23:30:00";
+		LinkedList<Timestamp> slotTime = feedbacksRepo.findSlotTimeByUserIdAndDateTime(loggedinUserId, startDate, endDate);
+		LinkedList<Object[]> skillFactors = feedbacksRepo.findSkillFactorsByUserIdAndDateTime(loggedinUserId, startDate, endDate);
+		LinkedList<Double> confidence = new LinkedList<Double>();
+		LinkedList<Double> impression = new LinkedList<Double>();
+		LinkedList<Double> proficiency = new LinkedList<Double>();
+		LinkedList<Integer> dates = new LinkedList<Integer>();
+		double proficiencyLevel = 0, confidenceLevel = 0, impressionLevel = 0;
+		int tempDate = 0;
+		int count = 0;
+		int skillFactorsSize = skillFactors.size();
+		for(int i=0; i<skillFactorsSize; i++)
+		{
+			if(skillFactors.get(i)[0] != null) {
+				if(tempDate == 0) {
+					tempDate = slotTime.get(i).getDate();
+				}
+				
+				if(tempDate == slotTime.get(i).getDate()) {
+					count++;
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					
+					if(i == skillFactorsSize-1 && count > 1)
+					{
+						confidence.add(confidenceLevel/count);
+						impression.add(impressionLevel/count);
+						proficiency.add(proficiencyLevel/count);
+						dates.add(tempDate);
+					}
+				}
+				
+				
+				/* Checking whether count has been increased more than 2 but new date comes, so storing the old values  
+				 * first and re-initiating the logic for new date 
+				 * */
+				
+				else if(count > 1) {
+					confidence.add(confidenceLevel/count);
+					impression.add(impressionLevel/count);
+					proficiency.add(proficiencyLevel/count);
+					dates.add(tempDate);
+					confidenceLevel = 0; impressionLevel = 0; proficiencyLevel = 0;
+					
+					/* Assigning new data again */
+					tempDate = slotTime.get(i).getDate();
+					count = 0;
+					count++;
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					
+					if(i == skillFactorsSize-1)
+					{
+						confidence.add(confidenceLevel);
+						impression.add(impressionLevel);
+						proficiency.add(proficiencyLevel);
+						dates.add(tempDate);
+					}
+				}
+				
+				/* If the old date and new date is different without any repitation on old date */
+				else {
+					confidence.add(confidenceLevel);
+					impression.add(impressionLevel);
+					proficiency.add(proficiencyLevel);
+					dates.add(tempDate);
+					
+					confidenceLevel = 0; impressionLevel = 0; proficiencyLevel = 0;
+					
+					/* Assigning new data again */
+					tempDate = slotTime.get(i).getDate();
+					count = 0;
+					count++;
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					
+					if(i == skillFactorsSize-1)
+					{
+						confidence.add(confidenceLevel);
+						impression.add(impressionLevel);
+						proficiency.add(proficiencyLevel);
+						dates.add(tempDate);
+					}
+				}
+				
+				/* If the skill factor has only one row then value will be added in list here */
+				if(i == skillFactorsSize-1 && confidence.isEmpty())
+				{
+					confidence.add(confidenceLevel/count);
+					impression.add(impressionLevel/count);
+					proficiency.add(proficiencyLevel/count);
+					dates.add(tempDate);
+				}
+			}
+		}
+		LinkedList<Double> confidenceDatalist = new LinkedList<Double>();
+		LinkedList<Double> impressionDatalist = new LinkedList<Double>();
+		LinkedList<Double> proficiencyDatalist = new LinkedList<Double>();
+		int monthEndDate = Timestamp.valueOf(endDate).getDate();
+		int traverseDates = 0;
+		for(int j=1; j<=monthEndDate; j++) {
+			if(!dates.isEmpty()  && dates.get(traverseDates)==j) {
+				confidenceDatalist.add(confidence.get(traverseDates));
+				impressionDatalist.add(impression.get(traverseDates));
+				proficiencyDatalist.add(proficiency.get(traverseDates));
+				traverseDates++;
+				if(traverseDates>=dates.size()) {
+					dates.removeAll(dates);
+				}
+			}
+			else {
+				confidenceDatalist.add(0.0);
+				impressionDatalist.add(0.0);
+				proficiencyDatalist.add(0.0);
+			}
+			
+		}
+		GraphLineChartResponse graphLineChartResponse = graphLineChartResponseBuilder.buildResponse(confidenceDatalist, impressionDatalist, proficiencyDatalist);
+		return graphLineChartResponse;
 	}
 	
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */

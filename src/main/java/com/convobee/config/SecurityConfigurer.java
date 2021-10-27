@@ -52,6 +52,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 		.antMatchers("/getfeedbackhistory").hasAnyRole("USER","ADMIN")
 		.antMatchers("/viewfeedback").hasAnyRole("USER","ADMIN")
 		.antMatchers("/getpiechart").hasAnyRole("USER","ADMIN")
+		.antMatchers("/getgraphlinechart").hasAnyRole("USER","ADMIN")
 		.antMatchers("/admin").hasRole("ADMIN")
 		.antMatchers("/hello").hasAnyRole("USER","ADMIN")
 		.antMatchers("/signup").permitAll()

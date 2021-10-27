@@ -16,6 +16,7 @@ import com.convobee.api.rest.request.FeedbacksToUsRequest;
 import com.convobee.api.rest.request.ViewFeedbackRequest;
 import com.convobee.api.rest.response.DashboardPieChatResponse;
 import com.convobee.api.rest.response.FeedbackHistoryResponse;
+import com.convobee.api.rest.response.GraphLineChartResponse;
 import com.convobee.api.rest.response.InvalidPieChartResponse;
 import com.convobee.api.rest.response.ViewFeedbackResponse;
 import com.convobee.service.FeedbacksService;
@@ -51,6 +52,11 @@ public class FeedbackAPI {
 	@RequestMapping(value = "/getpiechart", method = RequestMethod.GET)
 	public DashboardPieChatResponse getPieChart(HttpServletRequest request) throws Exception{
 		return feedbacksService.getPieChart(request);
+	}
+	
+	@RequestMapping(value = "/getgraphlinechart", method = RequestMethod.GET)
+	public GraphLineChartResponse getGraphLineChart(HttpServletRequest request) throws Exception {
+		return feedbacksService.getGraphLineChart(request);
 	}
 	
 	@RequestMapping(value = "/getpiechartinvalid", method = RequestMethod.GET)
