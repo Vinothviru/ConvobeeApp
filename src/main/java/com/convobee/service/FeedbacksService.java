@@ -173,6 +173,13 @@ public class FeedbacksService {
 	}
 	
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
+	
+	/* 
+	 * TO DO
+	 * Need to convert dates based on timezone
+	 * Need to convert IST dates to user timezone before main logic
+	 * Need to remove the deprecated values
+	 * */
 	public GraphLineChartResponse getGraphLineChart(HttpServletRequest request) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		String startDate = "2021-10-01 00:00:00";
@@ -287,6 +294,136 @@ public class FeedbacksService {
 				traverseDates++;
 				if(traverseDates>=dates.size()) {
 					dates.removeAll(dates);
+				}
+			}
+			else {
+				confidenceDatalist.add(0.0);
+				impressionDatalist.add(0.0);
+				proficiencyDatalist.add(0.0);
+			}
+			
+		}
+		GraphLineChartResponse graphLineChartResponse = graphLineChartResponseBuilder.buildResponse(confidenceDatalist, impressionDatalist, proficiencyDatalist);
+		return graphLineChartResponse;
+	}
+	
+	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
+	public GraphLineChartResponse getGraphLineChartForYear(HttpServletRequest request) throws Exception {
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		String startDate = "2021-01-01 00:00:00";
+		String endDate = "2021-12-31 23:30:00";
+		//String endDate = "2021-10-31 23:30:00";
+		LinkedList<Timestamp> slotTime = feedbacksRepo.findSlotTimeByUserIdAndDateTime(loggedinUserId, startDate, endDate);
+		LinkedList<Object[]> skillFactors = feedbacksRepo.findSkillFactorsByUserIdAndDateTime(loggedinUserId, startDate, endDate);
+		LinkedList<Double> confidence = new LinkedList<Double>();
+		LinkedList<Double> impression = new LinkedList<Double>();
+		LinkedList<Double> proficiency = new LinkedList<Double>();
+		LinkedList<Integer> months = new LinkedList<Integer>();
+		double proficiencyLevel = 0, confidenceLevel = 0, impressionLevel = 0;
+		int tempMonth = 0;
+		int count = 0;
+		int skillFactorsSize = skillFactors.size();
+		for(int i=0; i<skillFactorsSize; i++)
+		{
+			int month = slotTime.get(i).getMonth()+1;//Added 1 because getMonth returns 10 for November
+			if(skillFactors.get(i)[0] != null) {
+				if(tempMonth == 0) {
+					tempMonth = month;
+				}
+				
+				if(tempMonth == month) {
+					count++;
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					
+					if(i == skillFactorsSize-1 && count > 1)
+					{
+						confidence.add(confidenceLevel/count);
+						impression.add(impressionLevel/count);
+						proficiency.add(proficiencyLevel/count);
+						months.add(tempMonth);
+					}
+				}
+				
+				
+				/* Checking whether count has been increased more than 2 but new date comes, so storing the old values  
+				 * first and re-initiating the logic for new date 
+				 * */
+				
+				else if(count > 1) {
+					confidence.add(confidenceLevel/count);
+					impression.add(impressionLevel/count);
+					proficiency.add(proficiencyLevel/count);
+					months.add(tempMonth);
+					confidenceLevel = 0; impressionLevel = 0; proficiencyLevel = 0;
+					
+					/* Assigning new data again */
+					tempMonth = month;
+					count = 0;
+					count++;
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					
+					if(i == skillFactorsSize-1)
+					{
+						confidence.add(confidenceLevel);
+						impression.add(impressionLevel);
+						proficiency.add(proficiencyLevel);
+						months.add(tempMonth);
+					}
+				}
+				
+				/* If the old date and new date is different without any repitation on old date */
+				else {
+					confidence.add(confidenceLevel);
+					impression.add(impressionLevel);
+					proficiency.add(proficiencyLevel);
+					months.add(tempMonth);
+					
+					confidenceLevel = 0; impressionLevel = 0; proficiencyLevel = 0;
+					
+					/* Assigning new data again */
+					tempMonth = month;
+					count = 0;
+					count++;
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					
+					if(i == skillFactorsSize-1)
+					{
+						confidence.add(confidenceLevel);
+						impression.add(impressionLevel);
+						proficiency.add(proficiencyLevel);
+						months.add(tempMonth);
+					}
+				}
+				
+				/* If the skill factor has only one row then value will be added in list here */
+				if(i == skillFactorsSize-1 && confidence.isEmpty())
+				{
+					confidence.add(confidenceLevel/count);
+					impression.add(impressionLevel/count);
+					proficiency.add(proficiencyLevel/count);
+					months.add(tempMonth);
+				}
+			}
+		}
+		LinkedList<Double> confidenceDatalist = new LinkedList<Double>();
+		LinkedList<Double> impressionDatalist = new LinkedList<Double>();
+		LinkedList<Double> proficiencyDatalist = new LinkedList<Double>();
+		int monthEndValue = Timestamp.valueOf(endDate).getMonth()+1;//Added 1 because getMonth returns 10 for November
+		int traverseMonths = 0;
+		for(int j=1; j<=monthEndValue; j++) {
+			if(!months.isEmpty()  && months.get(traverseMonths)==j) {
+				confidenceDatalist.add(confidence.get(traverseMonths));
+				impressionDatalist.add(impression.get(traverseMonths));
+				proficiencyDatalist.add(proficiency.get(traverseMonths));
+				traverseMonths++;
+				if(traverseMonths>=months.size()) {
+					months.removeAll(months);
 				}
 			}
 			else {

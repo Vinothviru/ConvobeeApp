@@ -59,6 +59,12 @@ public class FeedbackAPI {
 		return feedbacksService.getGraphLineChart(request);
 	}
 	
+	@RequestMapping(value = "/getgraphlinechartforyear", method = RequestMethod.GET)
+	public GraphLineChartResponse getGraphLineChartForYear(HttpServletRequest request) throws Exception {
+		return feedbacksService.getGraphLineChartForYear(request);
+	}
+	
+	
 	@RequestMapping(value = "/getpiechartinvalid", method = RequestMethod.GET)
 	public InvalidPieChartResponse getPieChartInvalid(HttpServletRequest request) throws Exception{
 		return feedbacksService.getPieChartInvalid(request);
