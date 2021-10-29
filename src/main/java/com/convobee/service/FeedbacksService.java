@@ -1,6 +1,11 @@
 package com.convobee.service;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -11,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.convobee.api.rest.request.FeedbacksRequest;
 import com.convobee.api.rest.request.FeedbacksToUsRequest;
+import com.convobee.api.rest.request.GraphLineChartRequest;
 import com.convobee.api.rest.request.ViewFeedbackRequest;
 import com.convobee.api.rest.response.DashboardPieChatResponse;
 import com.convobee.api.rest.response.FeedbackHistoryResponse;
@@ -30,6 +36,7 @@ import com.convobee.data.repository.FeedbacksRepo;
 import com.convobee.data.repository.FeedbacksToUsRepo;
 import com.convobee.data.repository.UsersRepo;
 import com.convobee.utils.CommonUtil;
+import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.UserUtil;
 
 @Service
@@ -137,6 +144,7 @@ public class FeedbacksService {
 		return pieChartResponseList;
 	}
 	
+	/* Double values cannot be done using switch case so implemented with else if */
 	public DashboardPieChatResponse  processPieChartValues(LinkedList<Object[]> result, int rowCount, DashboardPieChatResponse pieChartResponseList) throws Exception {
 		double oneStar = 0, twoStar = 0, threeStar = 0, fourStar = 0, fiveStar = 0;
 		for(int i = 0; i<result.size(); i++) {
@@ -180,12 +188,37 @@ public class FeedbacksService {
 	 * Need to convert IST dates to user timezone before main logic
 	 * Need to remove the deprecated values
 	 * */
-	public GraphLineChartResponse getGraphLineChart(HttpServletRequest request) throws Exception {
+	public GraphLineChartResponse getGraphLineChart(HttpServletRequest request, GraphLineChartRequest graphLineChartRequest) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
-		String startDate = "2021-10-01 00:00:00";
-		String endDate = "2021-10-31 23:30:00";
+		
+		/* Process of converting user time zone to UTC and querying and again converting to user time zone starts here*/
+		
+		String timeZone = graphLineChartRequest.getTimeZone();
+		int month = graphLineChartRequest.getMonth();
+		int year = graphLineChartRequest.getYear();
+		LocalDateTime endLocalDateTime;
+		LocalDateTime startLocalDateTime;
+		if(month==0) {
+			endLocalDateTime = LocalDateTime.parse((YearMonth.now(ZoneId.of(timeZone)).atEndOfMonth().toString()+"T23:30:00"));
+		}
+		else {
+			endLocalDateTime = LocalDateTime.parse(YearMonth.of(year, month).atEndOfMonth().toString()+"T23:30:00");
+		}
+		startLocalDateTime =  LocalDateTime.parse(String.valueOf(endLocalDateTime.getYear()) + "-" + String.valueOf(endLocalDateTime.getMonthValue()) + "-" + "01T00:00:00");
+		LocalDateTime utcStartDateTime = DateTimeUtil.toUtc(startLocalDateTime, timeZone);
+		LocalDateTime utcEndDateTime = DateTimeUtil.toUtc(endLocalDateTime, timeZone);
+		String startDate = utcStartDateTime.toString().replace('T', ' ')+":00";
+		String endDate = utcEndDateTime.toString().replace('T', ' ')+":00";
+		
 		LinkedList<Timestamp> slotTime = feedbacksRepo.findSlotTimeByUserIdAndDateTime(loggedinUserId, startDate, endDate);
 		LinkedList<Object[]> skillFactors = feedbacksRepo.findSkillFactorsByUserIdAndDateTime(loggedinUserId, startDate, endDate);
+		LinkedList<LocalDate> slotDate = new LinkedList<LocalDate>();
+		for(Timestamp dt : slotTime) {
+			slotDate.add(DateTimeUtil.toZone(dt.toLocalDateTime(), ZoneId.of("UTC"), ZoneId.of(timeZone)).toLocalDate());
+		}
+		
+		/* Process of converting user time zone to UTC and querying and again converting to user time zone ends here*/
+		
 		LinkedList<Double> confidence = new LinkedList<Double>();
 		LinkedList<Double> impression = new LinkedList<Double>();
 		LinkedList<Double> proficiency = new LinkedList<Double>();
@@ -196,12 +229,13 @@ public class FeedbacksService {
 		int skillFactorsSize = skillFactors.size();
 		for(int i=0; i<skillFactorsSize; i++)
 		{
+			int date = slotDate.get(i).getDayOfMonth();
 			if(skillFactors.get(i)[0] != null) {
 				if(tempDate == 0) {
-					tempDate = slotTime.get(i).getDate();
+					tempDate = date;
 				}
 				
-				if(tempDate == slotTime.get(i).getDate()) {
+				if(tempDate == date) {
 					count++;
 					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
 					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
@@ -229,7 +263,7 @@ public class FeedbacksService {
 					confidenceLevel = 0; impressionLevel = 0; proficiencyLevel = 0;
 					
 					/* Assigning new data again */
-					tempDate = slotTime.get(i).getDate();
+					tempDate = date;
 					count = 0;
 					count++;
 					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
@@ -255,7 +289,7 @@ public class FeedbacksService {
 					confidenceLevel = 0; impressionLevel = 0; proficiencyLevel = 0;
 					
 					/* Assigning new data again */
-					tempDate = slotTime.get(i).getDate();
+					tempDate = date;
 					count = 0;
 					count++;
 					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
@@ -284,7 +318,7 @@ public class FeedbacksService {
 		LinkedList<Double> confidenceDatalist = new LinkedList<Double>();
 		LinkedList<Double> impressionDatalist = new LinkedList<Double>();
 		LinkedList<Double> proficiencyDatalist = new LinkedList<Double>();
-		int monthEndDate = Timestamp.valueOf(endDate).getDate();
+		int monthEndDate = Timestamp.valueOf(endDate).toLocalDateTime().toLocalDate().getDayOfMonth();
 		int traverseDates = 0;
 		for(int j=1; j<=monthEndDate; j++) {
 			if(!dates.isEmpty()  && dates.get(traverseDates)==j) {

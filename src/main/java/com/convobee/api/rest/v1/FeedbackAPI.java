@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.convobee.api.rest.request.FeedbacksRequest;
 import com.convobee.api.rest.request.FeedbacksToUsRequest;
+import com.convobee.api.rest.request.GraphLineChartRequest;
 import com.convobee.api.rest.request.ViewFeedbackRequest;
 import com.convobee.api.rest.response.DashboardPieChatResponse;
 import com.convobee.api.rest.response.FeedbackHistoryResponse;
@@ -55,8 +56,8 @@ public class FeedbackAPI {
 	}
 	
 	@RequestMapping(value = "/getgraphlinechart", method = RequestMethod.GET)
-	public GraphLineChartResponse getGraphLineChart(HttpServletRequest request) throws Exception {
-		return feedbacksService.getGraphLineChart(request);
+	public GraphLineChartResponse getGraphLineChart(HttpServletRequest request, @ModelAttribute GraphLineChartRequest graphLineChartRequest) throws Exception {
+		return feedbacksService.getGraphLineChart(request, graphLineChartRequest);
 	}
 	
 	@RequestMapping(value = "/getgraphlinechartforyear", method = RequestMethod.GET)
