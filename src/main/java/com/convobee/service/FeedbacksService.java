@@ -192,19 +192,27 @@ public class FeedbacksService {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		
 		/* Process of converting user time zone to UTC and querying and again converting to user time zone starts here*/
-		
+
 		String timeZone = graphLineChartRequest.getTimeZone();
-		int month = graphLineChartRequest.getMonth();
+		Month month = graphLineChartRequest.getMonth();
 		int year = graphLineChartRequest.getYear();
 		LocalDateTime endLocalDateTime;
 		LocalDateTime startLocalDateTime;
-		if(month==0) {
+		if(month==null) {
 			endLocalDateTime = LocalDateTime.parse((YearMonth.now(ZoneId.of(timeZone)).atEndOfMonth().toString()+"T23:30:00"));
 		}
 		else {
 			endLocalDateTime = LocalDateTime.parse(YearMonth.of(year, month).atEndOfMonth().toString()+"T23:30:00");
 		}
-		startLocalDateTime =  LocalDateTime.parse(String.valueOf(endLocalDateTime.getYear()) + "-" + String.valueOf(endLocalDateTime.getMonthValue()) + "-" + "01T00:00:00");
+		/* Checking whether the month is between 1 and 10, if yes, then ned to append 0 before month value because LocalDateTime can't handle with single number month value like 2 for feb. */
+		if(endLocalDateTime.getMonthValue()>0&&endLocalDateTime.getMonthValue()<10)
+		{
+			startLocalDateTime =  LocalDateTime.parse(String.valueOf(endLocalDateTime.getYear()) + "-0" + String.valueOf(endLocalDateTime.getMonthValue()) + "-" + "01T00:00:00");
+		}
+		else {
+			startLocalDateTime =  LocalDateTime.parse(String.valueOf(endLocalDateTime.getYear()) + "-" + String.valueOf(endLocalDateTime.getMonthValue()) + "-" + "01T00:00:00");
+		}
+		
 		LocalDateTime utcStartDateTime = DateTimeUtil.toUtc(startLocalDateTime, timeZone);
 		LocalDateTime utcEndDateTime = DateTimeUtil.toUtc(endLocalDateTime, timeZone);
 		String startDate = utcStartDateTime.toString().replace('T', ' ')+":00";
@@ -318,7 +326,7 @@ public class FeedbacksService {
 		LinkedList<Double> confidenceDatalist = new LinkedList<Double>();
 		LinkedList<Double> impressionDatalist = new LinkedList<Double>();
 		LinkedList<Double> proficiencyDatalist = new LinkedList<Double>();
-		int monthEndDate = Timestamp.valueOf(endDate).toLocalDateTime().toLocalDate().getDayOfMonth();
+		int monthEndDate = endLocalDateTime.toLocalDate().getDayOfMonth();
 		int traverseDates = 0;
 		for(int j=1; j<=monthEndDate; j++) {
 			if(!dates.isEmpty()  && dates.get(traverseDates)==j) {
