@@ -20,6 +20,11 @@ public interface FeedbacksRepo extends JpaRepository<Feedbacks, Integer>{
 	@Query(value = "select users.nick_name, feedbacks.feedback_id as fid from feedbacks inner join users on users.user_id=feedbacks.provider_user_id and feedbacks.receiver_user_id=:userid order by fid desc limit 50",nativeQuery = true)
 	LinkedList<Object[]> findNickNamesAndfeedbackIdByUserId(int userid);
 	
+	@Query(value = "select slot_time from slots where slot_id in(select meetings.slot_id as sid from meetings inner join feedbacks on meetings.meeting_id = feedbacks.meeting_id and feedbacks.receiver_user_id=:userid and feedbacks.feedback_id>:feedbackid) order by slot_time desc limit 50",nativeQuery = true)
+	LinkedList<String> findSlotTimeByUserIdAndFeedbackId(int userid, int feedbackid);
+	
+	@Query(value = "select users.nick_name, feedbacks.feedback_id as fid from feedbacks inner join users on users.user_id=feedbacks.provider_user_id and feedbacks.receiver_user_id=:userid and feedbacks.feedback_id>:feedbackid order by fid desc limit 50",nativeQuery = true)
+	LinkedList<Object[]> findNickNamesAndfeedbackIdByUserIdAndFeedbackId(int userid, int feedbackid);
 	
 	@Query(value = "select impression_level as il,count(impression_level) from feedbacks where receiver_user_id=:userId group by il",nativeQuery = true)
 	LinkedList<Object[]> findImpressionLevelByReceiveruser(int userId);
