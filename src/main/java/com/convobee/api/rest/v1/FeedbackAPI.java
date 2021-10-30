@@ -61,8 +61,8 @@ public class FeedbackAPI {
 	}
 	
 	@RequestMapping(value = "/getgraphlinechartforyear", method = RequestMethod.GET)
-	public GraphLineChartResponse getGraphLineChartForYear(HttpServletRequest request) throws Exception {
-		return feedbacksService.getGraphLineChartForYear(request);
+	public GraphLineChartResponse getGraphLineChartForYear(HttpServletRequest request, GraphLineChartRequest graphLineChartRequest) throws Exception {
+		return feedbacksService.getGraphLineChartForYear(request, graphLineChartRequest);
 	}
 	
 	

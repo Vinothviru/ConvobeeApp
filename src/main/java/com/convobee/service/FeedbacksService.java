@@ -181,13 +181,6 @@ public class FeedbacksService {
 	}
 	
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
-	
-	/* 
-	 * TO DO
-	 * Need to convert dates based on timezone
-	 * Need to convert IST dates to user timezone before main logic
-	 * Need to remove the deprecated values
-	 * */
 	public GraphLineChartResponse getGraphLineChart(HttpServletRequest request, GraphLineChartRequest graphLineChartRequest) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		
@@ -350,13 +343,25 @@ public class FeedbacksService {
 	}
 	
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
-	public GraphLineChartResponse getGraphLineChartForYear(HttpServletRequest request) throws Exception {
+	public GraphLineChartResponse getGraphLineChartForYear(HttpServletRequest request, GraphLineChartRequest graphLineChartRequest) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
-		String startDate = "2021-01-01 00:00:00";
-		String endDate = "2021-12-31 23:30:00";
-		//String endDate = "2021-10-31 23:30:00";
+
+		String timeZone = graphLineChartRequest.getTimeZone();
+		int year = graphLineChartRequest.getYear();
+		
+		LocalDateTime startLocalDateTime = LocalDateTime.parse(String.valueOf(year)+"-01-01T00:00:00");
+		LocalDateTime endLocalDateTime = LocalDateTime.parse(String.valueOf(year)+"-12-31T23:30:00");
+		LocalDateTime utcStartDateTime = DateTimeUtil.toUtc(startLocalDateTime, timeZone);
+		LocalDateTime utcEndDateTime = DateTimeUtil.toUtc(endLocalDateTime, timeZone);
+		String startDate = utcStartDateTime.toString().replace('T', ' ')+":00";
+		String endDate = utcEndDateTime.toString().replace('T', ' ')+":00";
 		LinkedList<Timestamp> slotTime = feedbacksRepo.findSlotTimeByUserIdAndDateTime(loggedinUserId, startDate, endDate);
 		LinkedList<Object[]> skillFactors = feedbacksRepo.findSkillFactorsByUserIdAndDateTime(loggedinUserId, startDate, endDate);
+		LinkedList<LocalDate> slotDate = new LinkedList<LocalDate>();
+		for(Timestamp dt : slotTime) {
+			slotDate.add(DateTimeUtil.toZone(dt.toLocalDateTime(), ZoneId.of("UTC"), ZoneId.of(timeZone)).toLocalDate());
+		}
+		
 		LinkedList<Double> confidence = new LinkedList<Double>();
 		LinkedList<Double> impression = new LinkedList<Double>();
 		LinkedList<Double> proficiency = new LinkedList<Double>();
@@ -367,7 +372,7 @@ public class FeedbacksService {
 		int skillFactorsSize = skillFactors.size();
 		for(int i=0; i<skillFactorsSize; i++)
 		{
-			int month = slotTime.get(i).getMonth()+1;//Added 1 because getMonth returns 10 for November
+			int month = slotDate.get(i).getMonthValue();
 			if(skillFactors.get(i)[0] != null) {
 				if(tempMonth == 0) {
 					tempMonth = month;
@@ -456,7 +461,7 @@ public class FeedbacksService {
 		LinkedList<Double> confidenceDatalist = new LinkedList<Double>();
 		LinkedList<Double> impressionDatalist = new LinkedList<Double>();
 		LinkedList<Double> proficiencyDatalist = new LinkedList<Double>();
-		int monthEndValue = Timestamp.valueOf(endDate).getMonth()+1;//Added 1 because getMonth returns 10 for November
+		int monthEndValue = endLocalDateTime.toLocalDate().getMonthValue();
 		int traverseMonths = 0;
 		for(int j=1; j<=monthEndValue; j++) {
 			if(!months.isEmpty()  && months.get(traverseMonths)==j) {
