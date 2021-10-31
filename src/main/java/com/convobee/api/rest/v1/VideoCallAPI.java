@@ -24,6 +24,12 @@ public class VideoCallAPI {
 	{
 		return meetingsService.initiateMeeting(meetingsRequest);
 	}
+
+	@RequestMapping(value = "/initiatemeetingforsecondcall", method = RequestMethod.POST)
+	public VideoCallResponse initiateMeetingForSecondCall(HttpServletRequest request, @RequestBody MeetingsRequest meetingsRequest)
+	{
+		return meetingsService.initiateMeetingForSecondCall(meetingsRequest);
+	}
 	
 	@RequestMapping(value = "/changestatusofmeeting", method = RequestMethod.PUT)
 	public String changeStatusOfMeeting(@ModelAttribute MeetingsRequest meetingsRequest)

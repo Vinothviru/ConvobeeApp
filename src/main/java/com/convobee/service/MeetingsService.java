@@ -1,9 +1,13 @@
 package com.convobee.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -185,7 +189,184 @@ public class MeetingsService {
 		}
 		return videoCallResponseBuilder.buildResponse(meetingResponseList, unmatchedUser);
 	}
+	
+	public VideoCallResponse initiateMeetingForSecondCall(MeetingsRequest meetingsRequest) throws Exception {
+		Optional<BookedSlots> slot = bookedSlotsRepo.findById(meetingsRequest.getBookedSlotId());
+		List<Integer> listOfUsersIds = meetingsRequest.getListOfUserIds();
+		HashMap<Integer, Integer> affectedUserMap = meetingsRequest.getAffectedUserIds();
+		List<Integer> affectedUserIds = new ArrayList<Integer>(affectedUserMap.values());
+		List<Integer> listOfUsers = Stream.concat(affectedUserIds.stream(), listOfUsersIds.stream()).collect(Collectors.toList());
+		List<MeetingResponse> meetingResponseList = new LinkedList<MeetingResponse>();
+		List<LinkedList<String>> listOfUserInterests = new LinkedList<LinkedList<String>>();
+		for(Integer i=0; i<listOfUsers.size(); i++)
+		{
+			listOfUserInterests.add(interestsRepo.findInterestByUser(listOfUsers.get(i)));
+		}
+		int sizeOfInterestsList = listOfUserInterests.size();
+		Meetings meeting = null;
+		LinkedList<Integer> mismatchUser = new LinkedList<Integer>();
+		for(int i=0; i<sizeOfInterestsList; i++) {
+			int flag = 0;
+			LinkedList<Integer> userVsOppUser = new LinkedList<Integer>();
+			List<String> list1 = listOfUserInterests.get(i);
+			for(int j=i+1; j<sizeOfInterestsList;j++) {
+				List<String> list2 = listOfUserInterests.get(j);
+				System.out.println("list1 = " + list1);
+				System.out.println("list2 = " + list2);
+				System.out.println();
+				/* Comparing 2 lists and finding out the similar interests between them */
+				List<String> afterCompare = list1.stream().filter(list2::contains).collect(Collectors.toList());
+				
+				/* Checking whether any common interests found */
+				if(!afterCompare.isEmpty()) {
+					//System.out.println("Output = " + afterCompare);
+					//System.out.println("Output Result = " + afterCompare.get(0));
+					userVsOppUser.add(listOfUsers.get(i));
+					userVsOppUser.add(listOfUsers.get(j));
+					String meetingUrl = CommonUtil.getRandomUrl();
+					int user_a_id = listOfUsers.get(i);
+					int user_b_id = listOfUsers.get(j);
+					/* Write logic here for retrieving the user data , check whether the user_a_id in affectedUserIds */
+					//get key if map contains value java 8
+					//what if both usera,b are in affecteduserlist?
+					
+					/* checking whether the affected user got match */
+					Integer meeting_id =  processAffectedUsers(affectedUserMap, user_a_id, user_b_id);
+					
+					if(meeting_id==null) {
+						meeting = meetingsMapper.mapMeetings(user_a_id, user_b_id, meetingUrl, slot.get().getSlots().getSlotid());
+						meetingsRepo.save(meeting);//Persisting into Meetings table
+						Users user_a = usersRepo.getById(user_a_id);
+						Users user_b = usersRepo.getById(user_b_id);
+						user_a.setIsfeedbackgiven(false);
+						user_b.setIsfeedbackgiven(false);
+						usersRepo.save(user_a);
+						usersRepo.save(user_b);
+					}
+					
+					
 
+					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), user_a_id, user_b_id, meetingUrl, afterCompare, list2));
+					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting.getMeetingid(), user_b_id, user_a_id, meetingUrl, afterCompare, list1));
+					listOfUserInterests.remove(list1);
+					listOfUserInterests.remove(list2);
+					listOfUsers.remove(Integer.valueOf(user_a_id));
+					listOfUsers.remove(Integer.valueOf(user_b_id));
+					sizeOfInterestsList = listOfUserInterests.size();
+					i--;
+					flag = 1;
+					break;
+				}
+			}
+			
+			/* Handling unmatched users */
+			if(mismatchUser.size()<2 && flag == 0)
+			{
+				int user_id = listOfUsers.get(i);
+				mismatchUser.add(user_id);
+				
+//				listOfUserInterests.remove(listOfUserInterests.get(i));
+//				listOfUsers.remove(Integer.valueOf(user_id));
+//				sizeOfInterestsList = listOfUserInterests.size();
+				//i--;
+				
+				if(mismatchUser.size()==2)
+				{
+					int user_a_id = mismatchUser.get(0);
+					int user_b_id = mismatchUser.get(1);
+					String meetingUrl = null;
+					/* checking whether the affected user got match */
+					Integer meeting_id =  processAffectedUsers(affectedUserMap, user_a_id, user_b_id);
+					if(meeting_id==null) {
+						meetingUrl = CommonUtil.getRandomUrl();
+						meeting = meetingsMapper.mapMeetings(mismatchUser.get(0), mismatchUser.get(1), meetingUrl, slot.get().getSlots().getSlotid());
+						meetingsRepo.save(meeting);//Persisting into Meetings table
+						meeting_id = meeting.getMeetingid();
+						Users user_a = usersRepo.getById(user_a_id);
+						Users user_b = usersRepo.getById(user_b_id);
+						user_a.setIsfeedbackgiven(false);
+						user_b.setIsfeedbackgiven(false);
+						usersRepo.save(user_a);
+						usersRepo.save(user_b);
+					}
+					else {
+						meetingUrl = meetingsRepo.findById(meeting_id).get().getMeetingurl();
+					}
+					
+					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting_id, user_a_id, user_b_id, meetingUrl, null, listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(1)))));
+					meetingResponseList.add(meetingResponseBuilder.buildResponse(meeting_id, user_b_id, user_a_id, meetingUrl, null, listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(0)))));
+					
+					/* Very low priority - Need to do optimisation by removing the elements by un commenting the below lines else more iterations will happen */
+					
+					//listOfUserInterests.remove(listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(0))));
+					//listOfUserInterests.remove(listOfUserInterests.get(listOfUsers.indexOf(mismatchUser.get(1))));
+					//listOfUsers.remove(Integer.valueOf(mismatchUser.get(0)));
+					//listOfUsers.remove(Integer.valueOf(mismatchUser.get(1)));
+					//sizeOfInterestsList = listOfUserInterests.size();
+					//i--;
+					
+					mismatchUser.removeAll(mismatchUser);//Cleaning up users after mapping
+				}
+			}
+			
+		}
+		MeetingResponse.UnmatchedMeetingResponse unmatchedUser = new MeetingResponse.UnmatchedMeetingResponse();
+		if(mismatchUser.size()!=0)
+		{
+			unmatchedUser.setUnMatchedUserId(mismatchUser.get(0));
+		}
+		return videoCallResponseBuilder.buildResponse(meetingResponseList, unmatchedUser);
+	}
+	
+	/* checking whether the affected user got match */
+	public Integer processAffectedUsers(HashMap<Integer,Integer> affectedUserMap, Integer user_a_id, Integer user_b_id) throws Exception{
+		Integer meeting_a_id =  affectedUserMap.entrySet().stream()
+				  .filter(e -> e.getValue().equals(user_a_id))
+				  .map(Map.Entry::getKey)
+				  .findFirst()
+				  .orElse(null);
+				
+				if(meeting_a_id!=null) {
+					Integer meeting_b_id= affectedUserMap.entrySet().stream()
+					  .filter(e ->  e.getValue().equals(user_b_id))
+					  .map(Map.Entry::getKey)
+					  .findFirst()
+					  .orElse(null);
+					
+					if(meeting_b_id==null){
+						processMeetingsTable(user_a_id, user_b_id, meeting_a_id);
+					}
+					
+					else if(meeting_b_id!=null) {// if this condition is true then it means that both the users are affected users
+						processMeetingsTable(user_a_id, user_b_id, meeting_a_id);
+						processMeetingsTable(user_a_id, user_b_id, meeting_b_id);
+					}
+					
+				}
+				
+				return meeting_a_id;
+	}
+	public void processMeetingsTable(Integer user_a_id, Integer user_b_id, Integer meetingId) throws Exception{
+
+		Meetings meet = meetingsRepo.findById(meetingId).get();
+		int meeting_user_a_id = meet.getUseraid().getUserid();
+		int meeting_user_b_id = meet.getUserbid().getUserid();
+		if(meeting_user_a_id==user_a_id) {
+			Users user_b = usersRepo.getById(user_b_id);
+			user_b.setIsfeedbackgiven(false);
+			usersRepo.save(user_b);
+			meet.setUserbid(user_b);//Since user_a_id is equals to meetings table user_a_id, updating user_b_id which is not in affected user id 
+			meetingsRepo.save(meet);
+		}
+		else if (meeting_user_b_id==user_a_id){
+			Users user_a = usersRepo.getById(user_b_id);
+			user_a.setIsfeedbackgiven(false);
+			usersRepo.save(user_a);
+			meet.setUseraid(user_a);//Since user_a_id is equals to meetings table user_a_id, updating user_b_id which is not in affected user id 
+			meetingsRepo.save(meet);
+		}
+	
+	}
 	public String changeStatusOfMeeting(MeetingsRequest meetingsRequest) {
 		Meetings meeting = meetingsRepo.getById(meetingsRequest.getMeetingId());
 		meeting.setMeetingstatus(meetingsRequest.getStatus());
