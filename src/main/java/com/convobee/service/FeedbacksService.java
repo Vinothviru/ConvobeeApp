@@ -108,6 +108,20 @@ public class FeedbacksService {
 		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList);
 
 	}
+	
+	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
+	public LinkedList<FeedbackHistoryResponse> getFeedbackHistoryForCustomRange(HttpServletRequest request, FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception {
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		String startDateTime = feedbacksHistoryRequest.getStartDate()+"T00:00:00";
+		String endDateTime = feedbacksHistoryRequest.getEndDate()+"T23:30:00";
+		String timeZone = feedbacksHistoryRequest.getTimeZone();
+		String utcStartDateTime = DateTimeUtil.toUtc(LocalDateTime.parse(startDateTime), timeZone).toString().replace('T', ' ');
+		String utcEndDateTime = DateTimeUtil.toUtc(LocalDateTime.parse(endDateTime), timeZone).toString().replace('T', ' ');
+		LinkedList<String> listOfSlotTime = feedbacksRepo.findSlotTimeByUserIdAndDateRange(loggedinUserId, utcStartDateTime, utcEndDateTime);
+		LinkedList<Object[]> nickNameAndfeedbackIdList = feedbacksRepo.findNickNamesAndfeedbackIdByUserIdAndDateRange(loggedinUserId, utcStartDateTime, utcEndDateTime);
+		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList);
+	}
+	
 	/* Grouped two APIs -  getFeedbackHistory, getFeedbackHistoryForConsecutiveRequests */
 	public LinkedList<FeedbackHistoryResponse> processFeedbackHistory(LinkedList<String> listOfSlotTime, LinkedList<Object[]> nickNameAndfeedbackIdList) throws Exception {
 		int size = nickNameAndfeedbackIdList.size();

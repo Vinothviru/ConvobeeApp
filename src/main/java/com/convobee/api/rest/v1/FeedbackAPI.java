@@ -51,6 +51,11 @@ public class FeedbackAPI {
 		return feedbacksService.getFeedbackHistoryForConsecutiveRequests(request, feedbacksHistoryRequest);
 	}
 	
+	@RequestMapping(value = "/getfeedbackhistoryforcustomrange", method = RequestMethod.GET)
+	public LinkedList<FeedbackHistoryResponse> getFeedbackHistoryForCustomRange(HttpServletRequest request, FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception{
+		return feedbacksService.getFeedbackHistoryForCustomRange(request, feedbacksHistoryRequest);
+	}
+	
 	@RequestMapping(value = "/viewfeedback", method = RequestMethod.GET)
 	public ViewFeedbackResponse viewFeedback(HttpServletRequest request, @ModelAttribute ViewFeedbackRequest viewFeedbackRequest) throws Exception{
 		return feedbacksService.viewFeedback(request, viewFeedbackRequest);
