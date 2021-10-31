@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.convobee.api.rest.request.FeedbacksHistoryRequest;
 import com.convobee.api.rest.request.FeedbacksRequest;
 import com.convobee.api.rest.request.FeedbacksToUsRequest;
 import com.convobee.api.rest.request.GraphLineChartRequest;
@@ -43,6 +44,16 @@ public class FeedbackAPI {
 	@RequestMapping(value = "/getfeedbackhistory", method = RequestMethod.GET)
 	public LinkedList<FeedbackHistoryResponse> getFeedbackHistory(HttpServletRequest request) throws Exception{
 		return feedbacksService.getFeedbackHistory(request);
+	}
+	
+	@RequestMapping(value = "/getfeedbackhistoryforconsecutiverequests", method = RequestMethod.GET)
+	public LinkedList<FeedbackHistoryResponse> getFeedbackHistoryForConsecutiveRequests(HttpServletRequest request, FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception{
+		return feedbacksService.getFeedbackHistoryForConsecutiveRequests(request, feedbacksHistoryRequest);
+	}
+	
+	@RequestMapping(value = "/getfeedbackhistoryforcustomrange", method = RequestMethod.GET)
+	public LinkedList<FeedbackHistoryResponse> getFeedbackHistoryForCustomRange(HttpServletRequest request, FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception{
+		return feedbacksService.getFeedbackHistoryForCustomRange(request, feedbacksHistoryRequest);
 	}
 	
 	@RequestMapping(value = "/viewfeedback", method = RequestMethod.GET)

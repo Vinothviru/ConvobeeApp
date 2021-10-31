@@ -20,6 +20,17 @@ public interface FeedbacksRepo extends JpaRepository<Feedbacks, Integer>{
 	@Query(value = "select users.nick_name, feedbacks.feedback_id as fid from feedbacks inner join users on users.user_id=feedbacks.provider_user_id and feedbacks.receiver_user_id=:userid order by fid desc limit 50",nativeQuery = true)
 	LinkedList<Object[]> findNickNamesAndfeedbackIdByUserId(int userid);
 	
+	@Query(value = "select slot_time from slots where slot_id in(select meetings.slot_id as sid from meetings inner join feedbacks on meetings.meeting_id = feedbacks.meeting_id and feedbacks.receiver_user_id=:userid and feedbacks.feedback_id>:feedbackid) order by slot_time desc limit 50",nativeQuery = true)
+	LinkedList<String> findSlotTimeByUserIdAndFeedbackId(int userid, int feedbackid);
+	
+	@Query(value = "select users.nick_name, feedbacks.feedback_id as fid from feedbacks inner join users on users.user_id=feedbacks.provider_user_id and feedbacks.receiver_user_id=:userid and feedbacks.feedback_id>:feedbackid order by fid desc limit 50",nativeQuery = true)
+	LinkedList<Object[]> findNickNamesAndfeedbackIdByUserIdAndFeedbackId(int userid, int feedbackid);
+	
+	@Query(value = "select slot_time from slots where slot_id in(select meetings.slot_id as sid from meetings inner join feedbacks on meetings.meeting_id = feedbacks.meeting_id and feedbacks.receiver_user_id=:userid) and slot_time between :startdatetime and :enddatetime order by slot_time desc",nativeQuery = true)
+	LinkedList<String> findSlotTimeByUserIdAndDateRange(int userid, String startdatetime, String enddatetime);
+	
+	@Query(value = "select users.nick_name, feedbacks.feedback_id as fid from feedbacks inner join users on users.user_id=feedbacks.provider_user_id and feedback_id in(select feedback_id from feedbacks where feedbacks.meeting_id in(select meeting_id from meetings where slot_id in(select t.slot_id as tsid from (select slot_id,slot_time from slots where slot_id in(select meetings.slot_id as sid from meetings inner join feedbacks on meetings.meeting_id = feedbacks.meeting_id and feedbacks.receiver_user_id=:userid) and slot_time between :startdatetime and :enddatetime) as t) and (user_a_id=:userid or user_b_id=:userid)) and receiver_user_id=:userid) order by fid desc",nativeQuery = true)
+	LinkedList<Object[]> findNickNamesAndfeedbackIdByUserIdAndDateRange(int userid, String startdatetime, String enddatetime);
 	
 	@Query(value = "select impression_level as il,count(impression_level) from feedbacks where receiver_user_id=:userId group by il",nativeQuery = true)
 	LinkedList<Object[]> findImpressionLevelByReceiveruser(int userId);

@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.convobee.api.rest.request.FeedbacksHistoryRequest;
 import com.convobee.api.rest.request.FeedbacksRequest;
 import com.convobee.api.rest.request.FeedbacksToUsRequest;
 import com.convobee.api.rest.request.GraphLineChartRequest;
@@ -93,10 +94,38 @@ public class FeedbacksService {
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
 	public LinkedList<FeedbackHistoryResponse> getFeedbackHistory(HttpServletRequest request) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
-		LinkedList<FeedbackHistoryResponse> feedbackHistoryResponse = new LinkedList<FeedbackHistoryResponse>();
 		LinkedList<String> listOfSlotTime = feedbacksRepo.findSlotTimeByUserId(loggedinUserId);
 		LinkedList<Object[]> nickNameAndfeedbackIdList = feedbacksRepo.findNickNamesAndfeedbackIdByUserId(loggedinUserId);
+		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList);
+	}
+	
+	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
+	public LinkedList<FeedbackHistoryResponse> getFeedbackHistoryForConsecutiveRequests(HttpServletRequest request, FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception {
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		int feedbackId = feedbacksHistoryRequest.getFeedbackId();
+		LinkedList<String> listOfSlotTime = feedbacksRepo.findSlotTimeByUserIdAndFeedbackId(loggedinUserId, feedbackId);
+		LinkedList<Object[]> nickNameAndfeedbackIdList = feedbacksRepo.findNickNamesAndfeedbackIdByUserIdAndFeedbackId(loggedinUserId, feedbackId);
+		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList);
+
+	}
+	
+	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
+	public LinkedList<FeedbackHistoryResponse> getFeedbackHistoryForCustomRange(HttpServletRequest request, FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception {
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		String startDateTime = feedbacksHistoryRequest.getStartDate()+"T00:00:00";
+		String endDateTime = feedbacksHistoryRequest.getEndDate()+"T23:30:00";
+		String timeZone = feedbacksHistoryRequest.getTimeZone();
+		String utcStartDateTime = DateTimeUtil.toUtc(LocalDateTime.parse(startDateTime), timeZone).toString().replace('T', ' ');
+		String utcEndDateTime = DateTimeUtil.toUtc(LocalDateTime.parse(endDateTime), timeZone).toString().replace('T', ' ');
+		LinkedList<String> listOfSlotTime = feedbacksRepo.findSlotTimeByUserIdAndDateRange(loggedinUserId, utcStartDateTime, utcEndDateTime);
+		LinkedList<Object[]> nickNameAndfeedbackIdList = feedbacksRepo.findNickNamesAndfeedbackIdByUserIdAndDateRange(loggedinUserId, utcStartDateTime, utcEndDateTime);
+		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList);
+	}
+	
+	/* Grouped two APIs -  getFeedbackHistory, getFeedbackHistoryForConsecutiveRequests */
+	public LinkedList<FeedbackHistoryResponse> processFeedbackHistory(LinkedList<String> listOfSlotTime, LinkedList<Object[]> nickNameAndfeedbackIdList) throws Exception {
 		int size = nickNameAndfeedbackIdList.size();
+		LinkedList<FeedbackHistoryResponse> feedbackHistoryResponse = new LinkedList<FeedbackHistoryResponse>();
 		for(int i = 0; i<size ;i++) {
 			FeedbackHistoryResponse feedbackHistory = new FeedbackHistoryResponse();
 			feedbackHistory.setSlotDateTime(listOfSlotTime.get(i).replace('T', ' '));
@@ -106,7 +135,6 @@ public class FeedbacksService {
 		}
 		return feedbackHistoryResponse;
 	}
-	
 	public ViewFeedbackResponse viewFeedback(HttpServletRequest request, ViewFeedbackRequest viewFeedbackRequest) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		Feedbacks feedback = feedbacksRepo.findById(viewFeedbackRequest.getFeedbackId()).get();
