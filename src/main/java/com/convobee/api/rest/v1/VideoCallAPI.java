@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,9 +20,9 @@ public class VideoCallAPI {
 	MeetingsService meetingsService;
 	
 	@RequestMapping(value = "/initiatemeeting", method = RequestMethod.POST)
-	public VideoCallResponse initiateMeeting(HttpServletRequest request, @ModelAttribute MeetingsRequest meetingsRequest)
+	public VideoCallResponse initiateMeeting(HttpServletRequest request, @RequestBody MeetingsRequest meetingsRequest)
 	{
-		return meetingsService.addActiveUsers(request, meetingsRequest);
+		return meetingsService.initiateMeeting(meetingsRequest);
 	}
 	
 	@RequestMapping(value = "/changestatusofmeeting", method = RequestMethod.PUT)
