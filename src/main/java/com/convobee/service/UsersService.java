@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.response.UsersResponse;
 import com.convobee.api.rest.response.builder.UsersResponseBuilder;
@@ -17,6 +18,7 @@ import com.convobee.data.repository.InterestsRepo;
 import com.convobee.data.repository.UsersRepo;
 import com.convobee.utils.UserUtil;
 
+@Transactional
 @Service
 public class UsersService {
 

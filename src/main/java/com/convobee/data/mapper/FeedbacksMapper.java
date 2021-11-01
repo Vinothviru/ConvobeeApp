@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.FeedbacksRequest;
 import com.convobee.data.entity.Feedbacks;
@@ -14,6 +15,7 @@ import com.convobee.data.entity.Users;
 import com.convobee.data.repository.FeedbacksRepo;
 import com.convobee.data.repository.MeetingsRepo;
 
+@Transactional
 @Service
 public class FeedbacksMapper {
 	

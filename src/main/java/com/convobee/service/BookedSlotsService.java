@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.BookedSlotsRequest;
 import com.convobee.data.entity.BookedSlots;
@@ -18,6 +19,7 @@ import com.convobee.data.mapper.BookedSlotsMapper;
 import com.convobee.data.repository.BookedSlotsRepo;
 import com.convobee.utils.UserUtil;
 
+@Transactional
 @Service
 public class BookedSlotsService {
 

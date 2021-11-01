@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.AuthenticationRequest;
 import com.convobee.api.rest.request.UsersRequest;
@@ -19,6 +20,7 @@ import com.convobee.data.mapper.InterestsMapper;
 import com.convobee.data.mapper.UsersMapper;
 import com.convobee.utils.JWTUtil;
 
+@Transactional
 @Service
 public class AuthenticationService {
 

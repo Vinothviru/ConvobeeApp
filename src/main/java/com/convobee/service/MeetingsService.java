@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.MeetingsRequest;
 import com.convobee.api.rest.response.MeetingResponse;
@@ -25,6 +26,8 @@ import com.convobee.data.repository.MeetingsRepo;
 import com.convobee.data.repository.UsersRepo;
 import com.convobee.utils.CommonUtil;
 import com.convobee.utils.UserUtil;
+
+@Transactional
 @Service
 public class MeetingsService {
 
