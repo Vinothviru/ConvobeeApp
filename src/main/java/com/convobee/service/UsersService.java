@@ -59,4 +59,19 @@ public class UsersService {
 		return usersResponse;
 	}
 	
+	/* Verifying whether the requesting user and the data accessing user are same */
+	public boolean isValidUser(HttpServletRequest request, Users user) {
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		int dataAccessingUserId = user.getUserid();
+		if(loggedinUserId==dataAccessingUserId) {
+			return true;
+		}
+		return false;
+	}
+	
+	/* Verifying whether the logged in user is banned or not */
+	public boolean isBannedUser(HttpServletRequest request) {
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		return usersRepo.findById(loggedinUserId).get().isIsuserbanned();
+	}
 }
