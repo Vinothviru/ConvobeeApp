@@ -60,6 +60,9 @@ public class Users {
 	@Column(name = "is_user_banned")
 	@NotNull
 	private boolean isuserbanned;
+	@Column(name = "status")
+	@NotNull
+	private boolean status;
 	@Column(name = "created_at")
 	@NotNull
 	private Timestamp createdat;

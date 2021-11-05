@@ -12,6 +12,7 @@ import com.convobee.data.entity.Slots;
 import com.convobee.data.entity.Users;
 import com.convobee.data.repository.BookedSlotsRepo;
 
+@Transactional
 @Service
 public class BookedSlotsMapper {
 
@@ -31,7 +32,6 @@ public class BookedSlotsMapper {
 		return bookedSlots;
 	}
 	
-	@Transactional
 	public BookedSlots mapBookedSlotsForReschedule(BookedSlotsRequest bookedSlotsRequest) {
 		BookedSlots rescheduleSlot = bookedSlotsRepo.getById(bookedSlotsRequest.getBookedslotid());
 		int newSlotId = bookedSlotsRequest.getNewslotid();

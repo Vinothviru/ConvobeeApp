@@ -46,7 +46,7 @@ public class JWTUtil {
 		return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
 	}
 	
-	private boolean isTokenExpired(String token) {
+	public boolean isTokenExpired(String token) {
 		return extractExpiration(token).before(new Date());
 	}
 	public String generateToken(AuthUserDetails userDetails) {
@@ -65,7 +65,7 @@ public class JWTUtil {
 	
 	public boolean validateToken(String token, AuthUserDetails userDetails) {
 		final String username = extractUsername(token);
-		return (username.equals(userDetails.getUsername())&&!isTokenExpired(token));
+		return (username.equals(userDetails.getUsername())&&!isTokenExpired(token)&&userDetails.isEnabled());
 	}
 	
 }

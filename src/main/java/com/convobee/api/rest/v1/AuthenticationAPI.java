@@ -35,11 +35,15 @@ public class AuthenticationAPI {
 	AuthenticationService authenticationService; 
 
 	@RequestMapping(value = "/signup", method = RequestMethod.POST)
-	public ResponseEntity<?> signupAndCreateAuthenticationToken(@RequestBody UsersRequest usersRequest) throws Exception{
-		String jwt = authenticationService.signupAuthentication(usersRequest);
-		return ResponseEntity.ok(new AuthenticationResponse(jwt));
+	public void signupAndCreateAuthenticationToken(@RequestBody UsersRequest usersRequest) throws Exception{
+		authenticationService.signupAuthentication(usersRequest);
 	}
 
+	@RequestMapping(value = "/verifyuser", method = RequestMethod.POST)
+	public boolean verifyUser(@ModelAttribute UsersRequest usersRequest) throws Exception{
+		return authenticationService.verifyUser(usersRequest);
+	}
+	
 	/**
 	 * got to know about @ModelAttribute from here -> https://stackoverflow.com/questions/26612404/spring-map-get-request-parameters-to-pojo-automatically
 	 * @param request

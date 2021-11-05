@@ -1,7 +1,5 @@
 package com.convobee.api.rest.response;
 
-import java.sql.Timestamp;
-
 import lombok.Data;
 
 @Data

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.MeetingsRequest;
 import com.convobee.api.rest.response.MeetingResponse;
@@ -25,6 +26,8 @@ import com.convobee.data.repository.MeetingsRepo;
 import com.convobee.data.repository.UsersRepo;
 import com.convobee.utils.CommonUtil;
 import com.convobee.utils.UserUtil;
+
+@Transactional
 @Service
 public class MeetingsService {
 
@@ -80,19 +83,18 @@ public class MeetingsService {
 	 * 
 	 * TO DO
 	 * Low priority, not going to make big deal -  Need to do optimisation by removing the elements by un commenting the below lines else more iterations will happen(search this whole string to find the place) 
-	 * Need to check whether the requesting user and the data after retrieval's user id is same 
+	 * Need to check whether the requesting user and the data after retrieval's user id is same - I don't think it is valid
 	 * */
 	
 	//public Map<LinkedList<Integer>, String> initiateMeeting() {
 	public VideoCallResponse initiateMeeting(MeetingsRequest meetingsRequest) {
 		Optional<BookedSlots> slot = bookedSlotsRepo.findById(meetingsRequest.getBookedSlotId());
+		List<Integer> listOfUsers = meetingsRequest.getListOfUserIds();
 		List<MeetingResponse> meetingResponseList = new LinkedList<MeetingResponse>();
-		List<Integer> listOfUsers = new LinkedList<Integer>();
 		List<LinkedList<String>> listOfUserInterests = new LinkedList<LinkedList<String>>();
-		for(Integer i=0; i<listOfUserIds.size(); i++)
+		for(Integer i=0; i<listOfUsers.size(); i++)
 		{
-			listOfUsers.add(listOfUserIds.get(i));
-			listOfUserInterests.add(interestsRepo.findInterestByUser(listOfUserIds.get(i)));
+			listOfUserInterests.add(interestsRepo.findInterestByUser(listOfUsers.get(i)));
 		}
 		int sizeOfInterestsList = listOfUserInterests.size();
 		LinkedList<Integer> mismatchUser = new LinkedList<Integer>();
@@ -179,7 +181,6 @@ public class MeetingsService {
 			}
 			
 		}
-		listOfUserIds.removeAll(listOfUserIds);
 		MeetingResponse.UnmatchedMeetingResponse unmatchedUser = new MeetingResponse.UnmatchedMeetingResponse();
 		if(mismatchUser.size()!=0)
 		{
@@ -187,7 +188,12 @@ public class MeetingsService {
 		}
 		return videoCallResponseBuilder.buildResponse(meetingResponseList, unmatchedUser);
 	}
-
+	
+	public VideoCallResponse initiateMeetingForSecondCall(MeetingsRequest meetingsRequest) {
+		meetingsRepo.deleteAllById(meetingsRequest.getAffectedMeetingIds());
+		return initiateMeeting(meetingsRequest);
+	}
+	
 	public String changeStatusOfMeeting(MeetingsRequest meetingsRequest) {
 		Meetings meeting = meetingsRepo.getById(meetingsRequest.getMeetingId());
 		meeting.setMeetingstatus(meetingsRequest.getStatus());

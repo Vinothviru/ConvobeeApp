@@ -18,6 +18,7 @@ import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.SlotsRequest;
 import com.convobee.data.entity.Slots;
@@ -26,6 +27,7 @@ import com.convobee.utils.CommonUtil;
 import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.SlotUtil;
 
+@Transactional
 @Service
 public class SlotsService {
 
