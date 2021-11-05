@@ -20,5 +20,6 @@ public class UsersRequest {
 	private int reportcount;
 	private boolean isfeedback_given;
 	private List<String> interests;
+	private String token;
 	
 }

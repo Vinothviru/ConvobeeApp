@@ -19,6 +19,7 @@ public class AuthUserDetails implements UserDetails{
 	private String mailid;
 	private String password;
 	private List<GrantedAuthority> authorities;
+	private boolean status;
 	
 	public AuthUserDetails(Users user)
 	{
@@ -28,6 +29,7 @@ public class AuthUserDetails implements UserDetails{
 		this.authorities = Arrays.stream(user.getRole().split(","))
 														.map(SimpleGrantedAuthority::new)
 														.collect(Collectors.toList());
+		this.status = user.isStatus();
 																	
 	}
 	public AuthUserDetails() {
@@ -81,7 +83,8 @@ public class AuthUserDetails implements UserDetails{
 	public boolean isEnabled() {
 		// TODO Auto-generated method stub
 		//Hardcoded as true since we do not have such usecase
-		return true;
+		//We have a usecase for email verificaiton, so need to replace true with status
+		return status;
 	}
 
 }
