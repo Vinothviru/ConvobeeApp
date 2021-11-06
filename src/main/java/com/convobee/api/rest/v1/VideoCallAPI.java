@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.convobee.api.rest.request.MeetingsRequest;
 import com.convobee.api.rest.response.VideoCallResponse;
+import com.convobee.exception.UserValidationException;
 import com.convobee.service.MeetingsService;
 
 @RestController
@@ -32,16 +33,16 @@ public class VideoCallAPI {
 	}
 	
 	@RequestMapping(value = "/changestatusofmeetingtostarted", method = RequestMethod.PUT)
-	public String changeStatusOfMeetingtoStarted(@ModelAttribute MeetingsRequest meetingsRequest)
+	public String changeStatusOfMeetingtoStarted(HttpServletRequest request, @ModelAttribute MeetingsRequest meetingsRequest) throws UserValidationException
 	{
-		meetingsService.changeStatusOfMeetingtoStarted(meetingsRequest);
+		meetingsService.changeStatusOfMeetingtoStarted(request, meetingsRequest);
 		return "OK";
 	}
 	
 	@RequestMapping(value = "/changestatusofmeetingtocompleted", method = RequestMethod.PUT)
-	public String changeStatusOfMeetingtoCompleted(@ModelAttribute MeetingsRequest meetingsRequest)
+	public String changeStatusOfMeetingtoCompleted(HttpServletRequest request, @ModelAttribute MeetingsRequest meetingsRequest) throws UserValidationException
 	{
-		meetingsService.changeStatusOfMeetingtoCompleted(meetingsRequest);
+		meetingsService.changeStatusOfMeetingtoCompleted(request, meetingsRequest);
 		return "OK";
 	}
 	

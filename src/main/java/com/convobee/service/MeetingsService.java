@@ -25,6 +25,7 @@ import com.convobee.data.repository.BookedSlotsRepo;
 import com.convobee.data.repository.InterestsRepo;
 import com.convobee.data.repository.MeetingsRepo;
 import com.convobee.data.repository.UsersRepo;
+import com.convobee.exception.UserValidationException;
 import com.convobee.utils.CommonUtil;
 import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.UserUtil;
@@ -41,6 +42,9 @@ public class MeetingsService {
 	
 	@Autowired
 	UserUtil userUtil;
+	
+	@Autowired
+	UsersService usersService;
 	
 	@Autowired
 	InterestsRepo interestsRepo;
@@ -196,15 +200,25 @@ public class MeetingsService {
 		return initiateMeeting(meetingsRequest);
 	}
 	
-	public String changeStatusOfMeetingtoStarted(MeetingsRequest meetingsRequest) {
+	public String changeStatusOfMeetingtoStarted(HttpServletRequest request, MeetingsRequest meetingsRequest) throws UserValidationException {
 		Meetings meeting = meetingsRepo.getById(meetingsRequest.getMeetingId());
+		if(!usersService.isValidUser(request, meeting.getUseraid())) {
+			if(!usersService.isValidUser(request, meeting.getUserbid())) {
+				throw new UserValidationException(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
+			}
+		}
 		meeting.setMeetingstatus(Constants.STARTED);
 		meetingsRepo.save(meeting);
 		return "OK";
 	}
 	
-	public String changeStatusOfMeetingtoCompleted(MeetingsRequest meetingsRequest) {
+	public String changeStatusOfMeetingtoCompleted(HttpServletRequest request, MeetingsRequest meetingsRequest) throws UserValidationException {
 		Meetings meeting = meetingsRepo.getById(meetingsRequest.getMeetingId());
+		if(!usersService.isValidUser(request, meeting.getUseraid())) {
+			if(!usersService.isValidUser(request, meeting.getUserbid())) {
+				throw new UserValidationException(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
+			}
+		}
 		meeting.setMeetingstatus(Constants.COMPLETED);
 		meeting.setEndedat(DateTimeUtil.getCurrentUTCTime());
 		meetingsRepo.save(meeting);

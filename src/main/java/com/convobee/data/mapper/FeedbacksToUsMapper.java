@@ -8,12 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.FeedbacksToUsRequest;
+import com.convobee.constants.Constants;
 import com.convobee.data.entity.FeedbacksToUs;
 import com.convobee.data.entity.Meetings;
 import com.convobee.data.entity.Users;
 import com.convobee.data.repository.FeedbacksToUsRepo;
 import com.convobee.data.repository.MeetingsRepo;
 import com.convobee.data.repository.UsersRepo;
+import com.convobee.exception.UserValidationException;
 import com.convobee.utils.DateTimeUtil;
 
 @Transactional
@@ -28,7 +30,7 @@ public class FeedbacksToUsMapper {
 	@Autowired
 	UsersRepo usersRepo;
 	
-	public FeedbacksToUs mapFeedbacksToUs(FeedbacksToUsRequest feedbacksRequestToUs, int currentUserId) {
+	public FeedbacksToUs mapFeedbacksToUs(FeedbacksToUsRequest feedbacksRequestToUs, int currentUserId) throws Exception {
 		int meetingId = feedbacksRequestToUs.getMeetingId();
 		
 		/* Checking whether the user is already provided the feedback for particular meeting and if yes, not allowing to do the same */
@@ -37,12 +39,14 @@ public class FeedbacksToUsMapper {
 		if(!fb.isEmpty()) {
 			if(fb.get(0).getProvideruser().getUserid() == currentUserId)
 			{
-				System.out.println("Already kuduthutiye da dei :joy:");
-				return null;
+				throw new Exception(Constants.ALREADY_FEEDBACK_PROVIDED);
+				//System.out.println("Already kuduthutiye da dei :joy:");
+				//return null;
 			}
 			else if(fb.size()>1) {
-				System.out.println("Epdiyo kuduthurpa ilena vera edho oru user indha data va access pana try panran");
-				return null;
+				throw new Exception(Constants.EITHER_PROVIDED_OR_TRYING_TO_ACCESS_IRRELEVANT_DATA);
+				//System.out.println("Epdiyo kuduthurpa ilena vera edho oru user indha data va access pana try panran");
+				//return null;
 			}
 		}
 		
@@ -67,8 +71,9 @@ public class FeedbacksToUsMapper {
 		}
 		else
 		{
-			System.out.println("Inoruthan data va access pandriya da body soda");
-			return null;
+			throw new UserValidationException(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
+			//System.out.println("Inoruthan data va access pandriya da body soda");
+			//return null;
 		}
 		Users providerUser = new Users();
 		providerUser.setUserid(providerUserId);

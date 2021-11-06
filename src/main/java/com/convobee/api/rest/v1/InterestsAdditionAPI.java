@@ -14,6 +14,7 @@ public class InterestsAdditionAPI {
 	@Autowired
 	InterestsService interestsService;
 	
+	/* Added only by admin */
 	@RequestMapping(value = "/addinterests", method = RequestMethod.POST)
 	public String addInterests(@RequestBody InterestsRequest interestsRequest) throws Exception{
 		interestsService.addInterests(interestsRequest);

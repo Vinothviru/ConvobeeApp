@@ -39,7 +39,7 @@ public class AuthenticationAPI {
 		authenticationService.signupAuthentication(usersRequest);
 	}
 
-	@RequestMapping(value = "/verifyuser", method = RequestMethod.POST)
+	@RequestMapping(value = "/verifyuser", method = RequestMethod.PUT)
 	public boolean verifyUser(@ModelAttribute UsersRequest usersRequest) throws Exception{
 		return authenticationService.verifyUser(usersRequest);
 	}

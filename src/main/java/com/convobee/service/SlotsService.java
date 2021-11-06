@@ -96,7 +96,7 @@ public class SlotsService {
 				if(count==4) {
 					hoursToAdd+=6;
 				}
-				System.out.println("localDT+1 = " + utc.plusHours(hoursToAdd).toString().replace('T', ' '));
+				//System.out.println("localDT+1 = " + utc.plusHours(hoursToAdd).toString().replace('T', ' '));
 				finalTime.add(utc.plusHours(hoursToAdd).toString().replace('T', ' '));
 				count++;
 				hoursToAdd++;

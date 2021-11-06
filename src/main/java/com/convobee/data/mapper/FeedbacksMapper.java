@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.FeedbacksRequest;
+import com.convobee.constants.Constants;
 import com.convobee.data.entity.Feedbacks;
 import com.convobee.data.entity.Meetings;
 import com.convobee.data.entity.Users;
 import com.convobee.data.repository.FeedbacksRepo;
 import com.convobee.data.repository.MeetingsRepo;
+import com.convobee.exception.UserValidationException;
 import com.convobee.utils.DateTimeUtil;
 
 @Transactional
@@ -25,7 +27,7 @@ public class FeedbacksMapper {
 	@Autowired
 	FeedbacksRepo feedbacksRepo;
 	
-	public Feedbacks mapFeedbacks(FeedbacksRequest feedbacksRequest, int currentUserId) {
+	public Feedbacks mapFeedbacks(FeedbacksRequest feedbacksRequest, int currentUserId) throws Exception{
 		int meetingId = feedbacksRequest.getMeetingId();
 		
 		/* Checking whether the user is already provided the feedback for particular meeting and if yes, not allowing to do the same */
@@ -34,12 +36,14 @@ public class FeedbacksMapper {
 		if(!fb.isEmpty()) {
 			if(fb.get(0).getProvideruser().getUserid() == currentUserId)
 			{
-				System.out.println("Already kuduthutiye da dei :joy:");
-				return null;
+				throw new Exception(Constants.ALREADY_FEEDBACK_PROVIDED);
+				//System.out.println("Already kuduthutiye da dei :joy:");
+				//return null;
 			}
 			else if(fb.size()>1) {
-				System.out.println("Epdiyo kuduthurpa ilena vera edho oru user indha data va access pana try panran");
-				return null;
+				throw new Exception(Constants.EITHER_PROVIDED_OR_TRYING_TO_ACCESS_IRRELEVANT_DATA);
+				//System.out.println("Epdiyo kuduthurpa ilena vera edho oru user indha data va access pana try panran");
+				//return null;
 			}
 		}
 
@@ -62,10 +66,12 @@ public class FeedbacksMapper {
 			providerUserId = userBId;
 			receiverUserId = userAId;
 		}
+		/* This else condition passes only when a user trying to provide feedback to another meeting id in which he/she is not mapped :joy: */
 		else
 		{
-			System.out.println("Inoruthan data va access pandriya da body soda");
-			return null;
+			throw new UserValidationException(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
+			//System.out.println("Inoruthan data va access pandriya da body soda");
+			//return null;
 		}
 		
 		Users providedUser = new Users();

@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.BookedSlotsRequest;
+import com.convobee.constants.Constants;
 import com.convobee.data.entity.BookedSlots;
 import com.convobee.data.mapper.BookedSlotsMapper;
 import com.convobee.data.repository.BookedSlotsRepo;
+import com.convobee.exception.UserValidationException;
 import com.convobee.utils.UserUtil;
 
 @Transactional
@@ -32,27 +34,31 @@ public class BookedSlotsService {
 	@Autowired
 	BookedSlotsRepo bookedSlotsRepo;
 	
+	@Autowired
+	UsersService usersService;
+	
 	public Map<String, Integer> bookSlot(HttpServletRequest request, int slotid) {
 		int userid = userUtil.getLoggedInUserId(request);
 		BookedSlots bookedSlot = bookedSlotsMapper.mapBookedSlots(userid, slotid);
-		BookedSlots bookedSlotAfterAddition = bookedSlotsRepo.save(bookedSlot);
+		bookedSlotsRepo.save(bookedSlot);
 		return getUpcomingSessions(request);//need to handle it properly
 		//return bookedSlotAfterAddition.getBookedslotid();
 	}
 	
-	public Map<String, Integer> rescheduleBookedSlot(HttpServletRequest request, BookedSlotsRequest bookedSlotsRequest) {
-		BookedSlots rescheduleBookedSlot = bookedSlotsMapper.mapBookedSlotsForReschedule(bookedSlotsRequest);
-		/* Need to be handled the user has to reschedule only his data not others, we can achieve this through transaction rollback after persisting also */
-		BookedSlots bookedSlotAfterUpdation = bookedSlotsRepo.save(rescheduleBookedSlot);
+	public Map<String, Integer> rescheduleBookedSlot(HttpServletRequest request, BookedSlotsRequest bookedSlotsRequest) throws Exception {
+		BookedSlots rescheduleBookedSlot = bookedSlotsMapper.mapBookedSlotsForReschedule(request, bookedSlotsRequest);
+		/* Handled the user has to reschedule only his data not others, we can achieve this through transaction rollback after persisting also */
+		bookedSlotsRepo.save(rescheduleBookedSlot);
 		return getUpcomingSessions(request);
 	}
 	
-	public Map<String, Integer> deleteBookedSlot(HttpServletRequest request, int bookedslotid) {
+	public Map<String, Integer> deleteBookedSlot(HttpServletRequest request, int bookedslotid) throws Exception {
 		BookedSlots deleteBookedSlot = bookedSlotsRepo.getById(bookedslotid);
 		/* Handled the user has to delete only his data not others */
-		if(deleteBookedSlot.getUsers().getUserid()==userUtil.getLoggedInUserId(request)) {
-			bookedSlotsRepo.delete(deleteBookedSlot);
+		if(!usersService.isValidUser(request, deleteBookedSlot.getUsers())) {
+			throw new UserValidationException(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
 		}
+		bookedSlotsRepo.delete(deleteBookedSlot);
 		return getUpcomingSessions(request);
 	}
 
