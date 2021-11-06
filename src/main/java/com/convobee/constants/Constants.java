@@ -24,5 +24,15 @@ public class Constants {
     public  static  final String STARTED = "Started";
     public  static  final String COMPLETED = "Completed";
     /* Meeting status constants ends here */
+    
+    /* Exception constants starts here */
+    public  static  final String USER_TRYING_TO_ACCESS_IRRELEVANT_DATA = "Why trying to access irrelevant data?";
+    public  static  final String ALREADY_FEEDBACK_PROVIDED = "You have already provided the feedback!";
+    public  static  final String EITHER_PROVIDED_OR_TRYING_TO_ACCESS_IRRELEVANT_DATA = "You have provided the feedback already or trying to access irrelevant data!";
+    /* Exception constants ends here */
+    
+    /* Timezone constants starts here */
+    public  static  final String  UTC = "UTC";
+    /* Timezone constants ends here */
 }
 

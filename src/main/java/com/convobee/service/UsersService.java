@@ -48,15 +48,27 @@ public class UsersService {
 		int userId = userUtil.getLoggedInUserId(request);
 		LinkedList<Object[]> userDetails = usersRepo.findUserDetailsByUserid(userId);
 		List<String> interests = usersRepo.findInterestsByUserid(userId);
-		int size = userDetails.size();
 		UsersResponse usersResponse = null;
-		for(int i = 0; i<size ;i++) {
-			usersResponse = usersResponseBuilder.buildResponse(userDetails.get(0)[0].toString(),
-					userDetails.get(0)[1].toString(), userDetails.get(0)[2].toString(), 
-					userDetails.get(0)[3].toString(), userDetails.get(0)[4].toString(), 
-					userDetails.get(0)[5].toString(), userDetails.get(0)[6].toString(), LocalDateTime.parse(userDetails.get(0)[7].toString().replace(' ', 'T')), interests); 
-		}
+		usersResponse = usersResponseBuilder.buildResponse(userDetails.get(0)[0].toString(),
+				userDetails.get(0)[1].toString(), userDetails.get(0)[2].toString(), 
+				userDetails.get(0)[3].toString(), userDetails.get(0)[4].toString(), 
+				userDetails.get(0)[5].toString(), userDetails.get(0)[6].toString(), LocalDateTime.parse(userDetails.get(0)[7].toString().replace(' ', 'T')), interests); 
 		return usersResponse;
 	}
 	
+	/* Verifying whether the requesting user and the data accessing user are same */
+	public boolean isValidUser(HttpServletRequest request, Users user) {
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		int dataAccessingUserId = user.getUserid();
+		if(loggedinUserId==dataAccessingUserId) {
+			return true;
+		}
+		return false;
+	}
+	
+	/* Verifying whether the logged in user is banned or not */
+	public boolean isBannedUser(HttpServletRequest request) {
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		return usersRepo.findById(loggedinUserId).get().isIsuserbanned();
+	}
 }

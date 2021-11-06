@@ -43,19 +43,19 @@ public class SlotsAPI {
 	@RequestMapping(value = "/bookslot/{slotid}", method = RequestMethod.POST)
 	public Map<String, Integer> bookSlot(HttpServletRequest request, @PathVariable int slotid)
 	{
-		Map<String, Integer> bookedSLotId = bookedSlotsService.bookSlot(request, slotid);
-		return bookedSLotId;
+		Map<String, Integer> bookedSlotMap = bookedSlotsService.bookSlot(request, slotid);
+		return bookedSlotMap;
 	}
 	
 	@RequestMapping(value = "/rescheduleslot", method = RequestMethod.PUT)
-	public Map<String, Integer> rescheduleBookedSlot(HttpServletRequest request, @RequestBody BookedSlotsRequest bookedSlotsRequest) 
+	public Map<String, Integer> rescheduleBookedSlot(HttpServletRequest request, @RequestBody BookedSlotsRequest bookedSlotsRequest) throws Exception 
 	{
 		Map<String, Integer> bookedSlotId = bookedSlotsService.rescheduleBookedSlot(request,bookedSlotsRequest);
 		return bookedSlotId;
 	}
 	
 	@RequestMapping(value = "/deleteslot/{bookedslotid}", method = RequestMethod.DELETE)
-	public Map<String, Integer> deleteBookedSlot(HttpServletRequest request, @PathVariable int bookedslotid) 
+	public Map<String, Integer> deleteBookedSlot(HttpServletRequest request, @PathVariable int bookedslotid) throws Exception 
 	{
 		Map<String, Integer> isDeletedSlot = bookedSlotsService.deleteBookedSlot(request, bookedslotid);
 		return isDeletedSlot;
@@ -65,7 +65,7 @@ public class SlotsAPI {
 	public Map<String, Integer> getUpcomingSessions(HttpServletRequest request) 
 	{
 		Map<String, Integer> slotList = bookedSlotsService.getUpcomingSessions(request);
-		System.out.println("Final result at API = " + slotList);
+		//System.out.println("Final result at API = " + slotList);
 		return slotList;
 	}
 }

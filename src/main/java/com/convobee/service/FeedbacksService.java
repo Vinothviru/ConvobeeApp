@@ -29,6 +29,7 @@ import com.convobee.api.rest.response.builder.GraphLineChartResponseBuilder;
 import com.convobee.api.rest.response.builder.InvalidPieChartResponseBuilder;
 import com.convobee.api.rest.response.builder.PieChartResponseBuilder;
 import com.convobee.api.rest.response.builder.ViewFeedbackResponseBuilder;
+import com.convobee.constants.Constants;
 import com.convobee.data.entity.Feedbacks;
 import com.convobee.data.entity.FeedbacksToUs;
 import com.convobee.data.entity.Users;
@@ -37,6 +38,7 @@ import com.convobee.data.mapper.FeedbacksToUsMapper;
 import com.convobee.data.repository.FeedbacksRepo;
 import com.convobee.data.repository.FeedbacksToUsRepo;
 import com.convobee.data.repository.UsersRepo;
+import com.convobee.exception.UserValidationException;
 import com.convobee.utils.CommonUtil;
 import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.UserUtil;
@@ -64,6 +66,9 @@ public class FeedbacksService {
 	UserUtil userUtil;
 	
 	@Autowired
+	UsersService usersService;
+	
+	@Autowired
 	ViewFeedbackResponseBuilder viewFeedbackResponseBuilder;
 	
 	@Autowired
@@ -77,7 +82,7 @@ public class FeedbacksService {
 	
 	int count = 0;
 	
-	public void submitFeedback(HttpServletRequest request, FeedbacksRequest feedbacksRequest) {
+	public void submitFeedback(HttpServletRequest request, FeedbacksRequest feedbacksRequest) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		Feedbacks feedback = feedbacksMapper.mapFeedbacks(feedbacksRequest, loggedinUserId);
 		feedbacksRepo.save(feedback);
@@ -87,7 +92,7 @@ public class FeedbacksService {
 		usersRepo.save(user.get());
 	}
 	
-	public void submitFeedbackToUs(HttpServletRequest request, FeedbacksToUsRequest feedbacksToUsRequest) {
+	public void submitFeedbackToUs(HttpServletRequest request, FeedbacksToUsRequest feedbacksToUsRequest) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		FeedbacksToUs feedbacksToUs = feedbacksToUsMapper.mapFeedbacksToUs(feedbacksToUsRequest, loggedinUserId);
 		feedbacksToUsRepo.save(feedbacksToUs);
@@ -101,7 +106,7 @@ public class FeedbacksService {
 		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList);
 	}
 	
-	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
+	/* No need of user validation here because no param is passed from request exclusively. It is handled using Query itself */
 	public LinkedList<FeedbackHistoryResponse> getFeedbackHistoryForConsecutiveRequests(HttpServletRequest request, FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		int feedbackId = feedbacksHistoryRequest.getFeedbackId();
@@ -138,21 +143,17 @@ public class FeedbacksService {
 		return feedbackHistoryResponse;
 	}
 	public ViewFeedbackResponse viewFeedback(HttpServletRequest request, ViewFeedbackRequest viewFeedbackRequest) throws Exception {
-		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		Feedbacks feedback = feedbacksRepo.findById(viewFeedbackRequest.getFeedbackId()).get();
-		int feedbackReceiverUserId = feedback.getReceiveruser().getUserid();
 		/* Checking whether the logged in user accessing his data or not */
-		if(loggedinUserId == feedbackReceiverUserId)
+		if(!usersService.isValidUser(request, feedback.getReceiveruser()))
 		{
-			ViewFeedbackResponse viewFeedbackResponse = viewFeedbackResponseBuilder.buildResponse(feedback.getProficiencylevel(), feedback.getConfidencelevel(), 
-										feedback.getImpressionlevel(), feedback.getAppreciatefeedback(), feedback.getAdvisefeedback());
-			return viewFeedbackResponse;
+			throw new UserValidationException(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
+			//System.out.println("Inoruthan data va access pandriya da body soda");
+			//return null;
 		}
-		else
-		{
-			System.out.println("Inoruthan data va access pandriya da body soda");
-			return null;
-		}
+		ViewFeedbackResponse viewFeedbackResponse = viewFeedbackResponseBuilder.buildResponse(feedback.getProficiencylevel(), feedback.getConfidencelevel(), 
+				feedback.getImpressionlevel(), feedback.getAppreciatefeedback(), feedback.getAdvisefeedback());
+		return viewFeedbackResponse;
 	}
 	
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
@@ -245,7 +246,7 @@ public class FeedbacksService {
 		LinkedList<Object[]> skillFactors = feedbacksRepo.findSkillFactorsByUserIdAndDateTime(loggedinUserId, startDate, endDate);
 		LinkedList<LocalDate> slotDate = new LinkedList<LocalDate>();
 		for(Timestamp dt : slotTime) {
-			slotDate.add(DateTimeUtil.toZone(dt.toLocalDateTime(), ZoneId.of("UTC"), ZoneId.of(timeZone)).toLocalDate());
+			slotDate.add(DateTimeUtil.toZone(dt.toLocalDateTime(), ZoneId.of(Constants.UTC), ZoneId.of(timeZone)).toLocalDate());
 		}
 		
 		/* Process of converting user time zone to UTC and querying and again converting to user time zone ends here*/
@@ -389,7 +390,7 @@ public class FeedbacksService {
 		LinkedList<Object[]> skillFactors = feedbacksRepo.findSkillFactorsByUserIdAndDateTime(loggedinUserId, startDate, endDate);
 		LinkedList<LocalDate> slotDate = new LinkedList<LocalDate>();
 		for(Timestamp dt : slotTime) {
-			slotDate.add(DateTimeUtil.toZone(dt.toLocalDateTime(), ZoneId.of("UTC"), ZoneId.of(timeZone)).toLocalDate());
+			slotDate.add(DateTimeUtil.toZone(dt.toLocalDateTime(), ZoneId.of(Constants.UTC), ZoneId.of(timeZone)).toLocalDate());
 		}
 		
 		LinkedList<Double> confidence = new LinkedList<Double>();

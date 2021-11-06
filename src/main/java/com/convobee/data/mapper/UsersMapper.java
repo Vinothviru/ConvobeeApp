@@ -1,11 +1,10 @@
 package com.convobee.data.mapper;
 
-import java.sql.Timestamp;
-
 import org.springframework.stereotype.Service;
 
 import com.convobee.api.rest.request.UsersRequest;
 import com.convobee.data.entity.Users;
+import com.convobee.utils.DateTimeUtil;
 
 @Service
 public class UsersMapper {
@@ -24,8 +23,8 @@ public class UsersMapper {
 		user.setSignuptype(usersRequest.getSignuptype());
 		user.setReportcount(usersRequest.getReportcount());
 		user.setIsfeedbackgiven(true);
-		user.setCreatedat(Timestamp.valueOf("1970-01-01 00:00:01"));
-		user.setModifiedat(Timestamp.valueOf("1970-01-01 00:00:01"));
+		user.setCreatedat(DateTimeUtil.getCurrentUTCTime());
+		user.setModifiedat(DateTimeUtil.getCurrentUTCTime());
 		return user;
 	}
 

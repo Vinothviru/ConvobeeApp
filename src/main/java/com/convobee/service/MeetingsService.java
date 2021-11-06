@@ -16,6 +16,7 @@ import com.convobee.api.rest.response.MeetingResponse;
 import com.convobee.api.rest.response.VideoCallResponse;
 import com.convobee.api.rest.response.builder.MeetingResponseBuilder;
 import com.convobee.api.rest.response.builder.VideoCallResponseBuilder;
+import com.convobee.constants.Constants;
 import com.convobee.data.entity.BookedSlots;
 import com.convobee.data.entity.Meetings;
 import com.convobee.data.entity.Users;
@@ -24,7 +25,9 @@ import com.convobee.data.repository.BookedSlotsRepo;
 import com.convobee.data.repository.InterestsRepo;
 import com.convobee.data.repository.MeetingsRepo;
 import com.convobee.data.repository.UsersRepo;
+import com.convobee.exception.UserValidationException;
 import com.convobee.utils.CommonUtil;
+import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.UserUtil;
 
 @Transactional
@@ -39,6 +42,9 @@ public class MeetingsService {
 	
 	@Autowired
 	UserUtil userUtil;
+	
+	@Autowired
+	UsersService usersService;
 	
 	@Autowired
 	InterestsRepo interestsRepo;
@@ -194,9 +200,27 @@ public class MeetingsService {
 		return initiateMeeting(meetingsRequest);
 	}
 	
-	public String changeStatusOfMeeting(MeetingsRequest meetingsRequest) {
+	public String changeStatusOfMeetingtoStarted(HttpServletRequest request, MeetingsRequest meetingsRequest) throws UserValidationException {
 		Meetings meeting = meetingsRepo.getById(meetingsRequest.getMeetingId());
-		meeting.setMeetingstatus(meetingsRequest.getStatus());
+		if(!usersService.isValidUser(request, meeting.getUseraid())) {
+			if(!usersService.isValidUser(request, meeting.getUserbid())) {
+				throw new UserValidationException(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
+			}
+		}
+		meeting.setMeetingstatus(Constants.STARTED);
+		meetingsRepo.save(meeting);
+		return "OK";
+	}
+	
+	public String changeStatusOfMeetingtoCompleted(HttpServletRequest request, MeetingsRequest meetingsRequest) throws UserValidationException {
+		Meetings meeting = meetingsRepo.getById(meetingsRequest.getMeetingId());
+		if(!usersService.isValidUser(request, meeting.getUseraid())) {
+			if(!usersService.isValidUser(request, meeting.getUserbid())) {
+				throw new UserValidationException(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
+			}
+		}
+		meeting.setMeetingstatus(Constants.COMPLETED);
+		meeting.setEndedat(DateTimeUtil.getCurrentUTCTime());
 		meetingsRepo.save(meeting);
 		return "OK";
 	}
