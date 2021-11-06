@@ -1,13 +1,12 @@
 package com.convobee.data.mapper;
 
-import java.sql.Timestamp;
-
 import org.springframework.stereotype.Service;
 
 import com.convobee.constants.Constants;
 import com.convobee.data.entity.Meetings;
 import com.convobee.data.entity.Slots;
 import com.convobee.data.entity.Users;
+import com.convobee.utils.DateTimeUtil;
 
 @Service
 public class MeetingsMapper {
@@ -24,7 +23,7 @@ public class MeetingsMapper {
 		meetings.setUserbid(user_b);
 		meetings.setMeetingurl(meetingurl);
 		meetings.setMeetingstatus(Constants.INITIATED);
-		meetings.setStartedat(Timestamp.valueOf("1970-01-01 00:00:01"));
+		meetings.setStartedat(DateTimeUtil.getCurrentUTCTime());
 		meetings.setEndedat(null);
 		return meetings;
 	}

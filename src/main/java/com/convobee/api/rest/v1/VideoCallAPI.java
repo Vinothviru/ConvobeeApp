@@ -31,10 +31,17 @@ public class VideoCallAPI {
 		return meetingsService.initiateMeetingForSecondCall(meetingsRequest);
 	}
 	
-	@RequestMapping(value = "/changestatusofmeeting", method = RequestMethod.PUT)
-	public String changeStatusOfMeeting(@ModelAttribute MeetingsRequest meetingsRequest)
+	@RequestMapping(value = "/changestatusofmeetingtostarted", method = RequestMethod.PUT)
+	public String changeStatusOfMeetingtoStarted(@ModelAttribute MeetingsRequest meetingsRequest)
 	{
-		meetingsService.changeStatusOfMeeting(meetingsRequest);
+		meetingsService.changeStatusOfMeetingtoStarted(meetingsRequest);
+		return "OK";
+	}
+	
+	@RequestMapping(value = "/changestatusofmeetingtocompleted", method = RequestMethod.PUT)
+	public String changeStatusOfMeetingtoCompleted(@ModelAttribute MeetingsRequest meetingsRequest)
+	{
+		meetingsService.changeStatusOfMeetingtoCompleted(meetingsRequest);
 		return "OK";
 	}
 	

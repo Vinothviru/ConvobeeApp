@@ -1,7 +1,5 @@
 package com.convobee.data.mapper;
 
-import java.sql.Timestamp;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +9,7 @@ import com.convobee.data.entity.BookedSlots;
 import com.convobee.data.entity.Slots;
 import com.convobee.data.entity.Users;
 import com.convobee.data.repository.BookedSlotsRepo;
+import com.convobee.utils.DateTimeUtil;
 
 @Transactional
 @Service
@@ -27,8 +26,8 @@ public class BookedSlotsMapper {
 		slot.setSlotid(slotid);
 		bookedSlots.setUsers(user);
 		bookedSlots.setSlots(slot);
-		bookedSlots.setCreatedat(Timestamp.valueOf("1970-01-01 00:00:01"));
-		bookedSlots.setModifiedat(Timestamp.valueOf("1970-01-01 00:00:01"));
+		bookedSlots.setCreatedat(DateTimeUtil.getCurrentUTCTime());
+		bookedSlots.setModifiedat(DateTimeUtil.getCurrentUTCTime());
 		return bookedSlots;
 	}
 	

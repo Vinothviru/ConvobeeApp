@@ -16,6 +16,7 @@ import com.convobee.api.rest.response.MeetingResponse;
 import com.convobee.api.rest.response.VideoCallResponse;
 import com.convobee.api.rest.response.builder.MeetingResponseBuilder;
 import com.convobee.api.rest.response.builder.VideoCallResponseBuilder;
+import com.convobee.constants.Constants;
 import com.convobee.data.entity.BookedSlots;
 import com.convobee.data.entity.Meetings;
 import com.convobee.data.entity.Users;
@@ -25,6 +26,7 @@ import com.convobee.data.repository.InterestsRepo;
 import com.convobee.data.repository.MeetingsRepo;
 import com.convobee.data.repository.UsersRepo;
 import com.convobee.utils.CommonUtil;
+import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.UserUtil;
 
 @Transactional
@@ -194,9 +196,17 @@ public class MeetingsService {
 		return initiateMeeting(meetingsRequest);
 	}
 	
-	public String changeStatusOfMeeting(MeetingsRequest meetingsRequest) {
+	public String changeStatusOfMeetingtoStarted(MeetingsRequest meetingsRequest) {
 		Meetings meeting = meetingsRepo.getById(meetingsRequest.getMeetingId());
-		meeting.setMeetingstatus(meetingsRequest.getStatus());
+		meeting.setMeetingstatus(Constants.STARTED);
+		meetingsRepo.save(meeting);
+		return "OK";
+	}
+	
+	public String changeStatusOfMeetingtoCompleted(MeetingsRequest meetingsRequest) {
+		Meetings meeting = meetingsRepo.getById(meetingsRequest.getMeetingId());
+		meeting.setMeetingstatus(Constants.COMPLETED);
+		meeting.setEndedat(DateTimeUtil.getCurrentUTCTime());
 		meetingsRepo.save(meeting);
 		return "OK";
 	}

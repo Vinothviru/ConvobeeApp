@@ -1,6 +1,5 @@
 package com.convobee.data.mapper;
 
-import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +9,7 @@ import com.convobee.api.rest.request.UsersRequest;
 import com.convobee.data.entity.Interests;
 import com.convobee.data.entity.InterestsNames;
 import com.convobee.data.entity.Users;
+import com.convobee.utils.DateTimeUtil;
 
 @Service
 public class InterestsMapper {
@@ -23,8 +23,8 @@ public class InterestsMapper {
 			Interests interests = new Interests();
 			interests.setUser(user);
 			interests.setInterest(interestName);
-			interests.setCreatedat(Timestamp.valueOf("1970-01-01 00:00:01"));
-			interests.setModifiedat(Timestamp.valueOf("1970-01-01 00:00:01"));
+			interests.setCreatedat(DateTimeUtil.getCurrentUTCTime());
+			interests.setModifiedat(DateTimeUtil.getCurrentUTCTime());
 			interestList.add(interests);
 		}
 		return interestList;

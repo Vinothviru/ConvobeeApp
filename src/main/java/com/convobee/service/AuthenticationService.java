@@ -25,6 +25,7 @@ import com.convobee.data.repository.UsersRepo;
 import com.convobee.email.AccountVerificationEmailContext;
 import com.convobee.email.DefaultEmailService;
 import com.convobee.exception.InvalidTokenException;
+import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.JWTUtil;
 
 @Transactional
@@ -107,6 +108,7 @@ public class AuthenticationService {
         	throw new InvalidTokenException("User is already an verified user");
         }
         user.setStatus(true);
+        user.setModifiedat(DateTimeUtil.getCurrentUTCTime());
         usersRepo.save(user); // let's same user details
         return true;
     }

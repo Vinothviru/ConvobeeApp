@@ -11,5 +11,4 @@ public class MeetingsRequest {
 	private List<Integer> listOfUserIds;
 	private List<Integer> affectedMeetingIds;
 	private int meetingId;
-	private String status;
 }

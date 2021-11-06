@@ -1,6 +1,5 @@
 package com.convobee.data.mapper;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +13,7 @@ import com.convobee.data.entity.Meetings;
 import com.convobee.data.entity.Users;
 import com.convobee.data.repository.FeedbacksRepo;
 import com.convobee.data.repository.MeetingsRepo;
+import com.convobee.utils.DateTimeUtil;
 
 @Transactional
 @Service
@@ -80,7 +80,7 @@ public class FeedbacksMapper {
 		feedback.setProficiencylevel(feedbacksRequest.getProficiencyLevel());
 		feedback.setAppreciatefeedback(feedbacksRequest.getAppreciateFeedback());
 		feedback.setAdvisefeedback(feedbacksRequest.getAdviseFeedback());
-		feedback.setCreatedat(Timestamp.valueOf("1970-01-01 00:00:01"));
+		feedback.setCreatedat(DateTimeUtil.getCurrentUTCTime());
 		return feedback;
 	}
 }
