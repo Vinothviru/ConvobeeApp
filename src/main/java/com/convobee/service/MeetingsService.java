@@ -1,8 +1,9 @@
 package com.convobee.service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,18 +13,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.MeetingsRequest;
+import com.convobee.api.rest.request.UsersRequest;
 import com.convobee.api.rest.response.MeetingResponse;
 import com.convobee.api.rest.response.VideoCallResponse;
 import com.convobee.api.rest.response.builder.MeetingResponseBuilder;
 import com.convobee.api.rest.response.builder.VideoCallResponseBuilder;
 import com.convobee.constants.Constants;
-import com.convobee.data.entity.BookedSlots;
 import com.convobee.data.entity.Meetings;
 import com.convobee.data.entity.Users;
 import com.convobee.data.mapper.MeetingsMapper;
 import com.convobee.data.repository.BookedSlotsRepo;
 import com.convobee.data.repository.InterestsRepo;
 import com.convobee.data.repository.MeetingsRepo;
+import com.convobee.data.repository.SlotsRepo;
 import com.convobee.data.repository.UsersRepo;
 import com.convobee.exception.UserValidationException;
 import com.convobee.utils.CommonUtil;
@@ -61,6 +63,9 @@ public class MeetingsService {
 	@Autowired
 	UsersRepo usersRepo;
 	
+	@Autowired
+	SlotsRepo slotsRepo;
+	
 	List<Integer> listOfUserIds = new LinkedList<Integer>();
 	 
 	public VideoCallResponse addActiveUsers(HttpServletRequest request, MeetingsRequest meetingsRequest)
@@ -94,7 +99,11 @@ public class MeetingsService {
 	
 	//public Map<LinkedList<Integer>, String> initiateMeeting() {
 	public VideoCallResponse initiateMeeting(MeetingsRequest meetingsRequest) {
-		Optional<BookedSlots> slot = bookedSlotsRepo.findById(meetingsRequest.getBookedSlotId());
+		Instant currentUTCTime = Instant.now();  
+		Duration durationInMinutes = Duration.ofMinutes(5);
+		String startTime = currentUTCTime.minus(durationInMinutes).toString().replace('T', ' ').replace('Z', ' ');
+		String endTime = currentUTCTime.plus(durationInMinutes).toString().replace('T', ' ').replace('Z', ' ');
+		int slotId = slotsRepo.findSlotsIdByDateTimeRange(startTime, endTime);
 		List<Integer> listOfUsers = meetingsRequest.getListOfUserIds();
 		List<MeetingResponse> meetingResponseList = new LinkedList<MeetingResponse>();
 		List<LinkedList<String>> listOfUserInterests = new LinkedList<LinkedList<String>>();
@@ -125,7 +134,7 @@ public class MeetingsService {
 					String meetingUrl = CommonUtil.getRandomUrl();
 					int user_a_id = listOfUsers.get(i);
 					int user_b_id = listOfUsers.get(j);
-					Meetings meeting = meetingsMapper.mapMeetings(user_a_id, user_b_id, meetingUrl, slot.get().getSlots().getSlotid());
+					Meetings meeting = meetingsMapper.mapMeetings(user_a_id, user_b_id, meetingUrl, slotId);
 					meetingsRepo.save(meeting);//Persisting into Meetings table
 					Users user_a = usersRepo.getById(user_a_id);
 					Users user_b = usersRepo.getById(user_b_id);
@@ -160,7 +169,7 @@ public class MeetingsService {
 				if(mismatchUser.size()==2)
 				{
 					String meetingUrl = CommonUtil.getRandomUrl();
-					Meetings meeting = meetingsMapper.mapMeetings(mismatchUser.get(0), mismatchUser.get(1), meetingUrl, slot.get().getSlots().getSlotid());
+					Meetings meeting = meetingsMapper.mapMeetings(mismatchUser.get(0), mismatchUser.get(1), meetingUrl, slotId);
 					meetingsRepo.save(meeting);//Persisting into Meetings table
 					
 					Users user_a = usersRepo.getById(mismatchUser.get(0));
@@ -223,5 +232,17 @@ public class MeetingsService {
 		meeting.setEndedat(DateTimeUtil.getCurrentUTCTime());
 		meetingsRepo.save(meeting);
 		return "OK";
+	}
+
+	/* Verifying whether the user is not accessing irrelevant data as well as not a banned user */
+	public void prevalidationOfJoinSession(HttpServletRequest request, UsersRequest usersRequest) throws Exception{
+		int userIdFromDashboard = usersRequest.getUserid();
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		if(userIdFromDashboard!=loggedinUserId) {
+			throw new Exception(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
+		}
+		if(usersService.isBannedUser(loggedinUserId)) {
+			throw new Exception(Constants.BANNED_USER);
+		}
 	}
 }

@@ -115,6 +115,7 @@ public class AuthenticationService {
 
 
 	public String loginAuthentication(AuthenticationRequest authenticationRequest) throws Exception {
+		final AuthUserDetails userDetails = usersService.authenticate(authenticationRequest);
 		try {
 			authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(authenticationRequest.getMailid(), authenticationRequest.getPassword())
@@ -123,7 +124,6 @@ public class AuthenticationService {
 		catch(BadCredentialsException e) {
 			throw new Exception("Incorrect Username or Password", e);
 		}
-		final AuthUserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getMailid());
 		final String jwt = jwtUtil.generateToken(userDetails);
 		return jwt;
 	}

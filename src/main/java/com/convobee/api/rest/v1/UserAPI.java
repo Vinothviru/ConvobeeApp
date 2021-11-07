@@ -20,4 +20,9 @@ public class UserAPI {
 	public UsersResponse getUserDetails(HttpServletRequest request) throws Exception{
 		return usersService.getUserDetails(request);
 	}
+	
+	@RequestMapping(value = "/getjwtexpiration", method = RequestMethod.GET)
+	public boolean getJWTExpiration(HttpServletRequest request) throws Exception{
+		return usersService.isUserJWTGoingToExpire(request);
+	}
 }

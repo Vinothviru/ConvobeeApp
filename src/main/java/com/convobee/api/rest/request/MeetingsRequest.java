@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class MeetingsRequest {
 
+	@Deprecated
 	private int bookedSlotId;
 	private List<Integer> listOfUserIds;
 	private List<Integer> affectedMeetingIds;

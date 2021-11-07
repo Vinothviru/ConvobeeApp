@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.convobee.api.rest.request.MeetingsRequest;
+import com.convobee.api.rest.request.UsersRequest;
 import com.convobee.api.rest.response.VideoCallResponse;
 import com.convobee.exception.UserValidationException;
 import com.convobee.service.MeetingsService;
@@ -46,5 +47,10 @@ public class VideoCallAPI {
 		return "OK";
 	}
 	
-	
+	@RequestMapping(value = "/prevalidationofjoinsession", method = RequestMethod.GET)
+	public String prevalidationOfJoinSession(HttpServletRequest request, @ModelAttribute UsersRequest usersRequest) throws Exception
+	{
+		meetingsService.prevalidationOfJoinSession(request, usersRequest);
+		return "OK";
+	}
 }

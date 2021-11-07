@@ -15,4 +15,7 @@ public interface SlotsRepo extends JpaRepository<Slots, Integer>{
 	
 	@Query(value ="SELECT s.slotid FROM Slots s WHERE slot_time in :finalTime")
 	LinkedList<Integer> findSlotsIdByDateTime(List<String> finalTime);
+	
+	@Query(value ="SELECT slot_id FROM slots  where slot_time between :startdatetime and :enddatetime",nativeQuery = true)
+	Integer findSlotsIdByDateTimeRange(String startdatetime, String enddatetime);
 }
