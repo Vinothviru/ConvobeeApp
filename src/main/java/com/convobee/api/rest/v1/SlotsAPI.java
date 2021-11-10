@@ -1,7 +1,5 @@
 package com.convobee.api.rest.v1;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.convobee.api.rest.request.BookedSlotsRequest;
 import com.convobee.api.rest.request.SlotsRequest;
+import com.convobee.api.rest.response.BaseResponse;
 import com.convobee.service.BookedSlotsService;
 import com.convobee.service.SlotsService;
 
@@ -27,45 +26,39 @@ public class SlotsAPI {
 	@Autowired
 	BookedSlotsService bookedSlotsService;
 	
+	/* Added only by admin */
 	@RequestMapping(value = "/addslot", method = RequestMethod.POST)
-	public ResponseEntity<?> addSlot(@RequestBody SlotsRequest slotsRequest) throws Exception{
-		slotsService.addSlot(slotsRequest);
-		return ResponseEntity.ok(new String("Done"));
+	public ResponseEntity addSlot(@RequestBody SlotsRequest slotsRequest) throws Exception{
+		return  new BaseResponse().getResponse( ()-> slotsService.addSlot(slotsRequest));
 	}
 	
 	@RequestMapping(value = "/showslots", method = RequestMethod.GET)
-	public Map<String, Map<Integer, String>> showSlots(@ModelAttribute SlotsRequest slotsRequest) throws Exception{
-		return slotsService.showSlots(slotsRequest.getTimezone());
-		
-		//return ResponseEntity.ok(new String("Done"));
+	public ResponseEntity showSlots(HttpServletRequest request, @ModelAttribute SlotsRequest slotsRequest) throws Exception{
+		return  new BaseResponse().getResponse( ()-> slotsService.showSlots(request, slotsRequest.getTimezone()));
 	}
 	
 	@RequestMapping(value = "/bookslot/{slotid}", method = RequestMethod.POST)
-	public Map<String, Integer> bookSlot(HttpServletRequest request, @PathVariable int slotid)
+	public ResponseEntity bookSlot(HttpServletRequest request, @PathVariable int slotid)
 	{
-		Map<String, Integer> bookedSlotMap = bookedSlotsService.bookSlot(request, slotid);
-		return bookedSlotMap;
+		return  new BaseResponse().getResponse( ()-> bookedSlotsService.bookSlot(request, slotid));
 	}
 	
 	@RequestMapping(value = "/rescheduleslot", method = RequestMethod.PUT)
-	public Map<String, Integer> rescheduleBookedSlot(HttpServletRequest request, @RequestBody BookedSlotsRequest bookedSlotsRequest) throws Exception 
+	public ResponseEntity rescheduleBookedSlot(HttpServletRequest request, @RequestBody BookedSlotsRequest bookedSlotsRequest) throws Exception 
 	{
-		Map<String, Integer> bookedSlotId = bookedSlotsService.rescheduleBookedSlot(request,bookedSlotsRequest);
-		return bookedSlotId;
+		return  new BaseResponse().getResponse( ()-> bookedSlotsService.rescheduleBookedSlot(request,bookedSlotsRequest));
 	}
 	
 	@RequestMapping(value = "/deleteslot/{bookedslotid}", method = RequestMethod.DELETE)
-	public Map<String, Integer> deleteBookedSlot(HttpServletRequest request, @PathVariable int bookedslotid) throws Exception 
+	public ResponseEntity deleteBookedSlot(HttpServletRequest request, @PathVariable int bookedslotid) throws Exception 
 	{
-		Map<String, Integer> isDeletedSlot = bookedSlotsService.deleteBookedSlot(request, bookedslotid);
-		return isDeletedSlot;
+		return  new BaseResponse().getResponse( ()-> bookedSlotsService.deleteBookedSlot(request, bookedslotid));
 	}
 	
 	@RequestMapping(value = "/getupcomingsessions", method = RequestMethod.GET)
-	public Map<String, Integer> getUpcomingSessions(HttpServletRequest request) 
+	public ResponseEntity getUpcomingSessions(HttpServletRequest request) 
 	{
-		Map<String, Integer> slotList = bookedSlotsService.getUpcomingSessions(request);
+		return  new BaseResponse().getResponse( ()-> bookedSlotsService.getUpcomingSessions(request));
 		//System.out.println("Final result at API = " + slotList);
-		return slotList;
 	}
 }

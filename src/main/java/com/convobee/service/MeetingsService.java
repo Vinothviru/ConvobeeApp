@@ -209,7 +209,7 @@ public class MeetingsService {
 		return initiateMeeting(meetingsRequest);
 	}
 	
-	public String changeStatusOfMeetingtoStarted(HttpServletRequest request, MeetingsRequest meetingsRequest) throws UserValidationException {
+	public boolean changeStatusOfMeetingtoStarted(HttpServletRequest request, MeetingsRequest meetingsRequest) throws UserValidationException {
 		Meetings meeting = meetingsRepo.getById(meetingsRequest.getMeetingId());
 		if(!usersService.isValidUser(request, meeting.getUseraid())) {
 			if(!usersService.isValidUser(request, meeting.getUserbid())) {
@@ -218,10 +218,10 @@ public class MeetingsService {
 		}
 		meeting.setMeetingstatus(Constants.STARTED);
 		meetingsRepo.save(meeting);
-		return "OK";
+		return true;
 	}
 	
-	public String changeStatusOfMeetingtoCompleted(HttpServletRequest request, MeetingsRequest meetingsRequest) throws UserValidationException {
+	public boolean changeStatusOfMeetingtoCompleted(HttpServletRequest request, MeetingsRequest meetingsRequest) throws UserValidationException {
 		Meetings meeting = meetingsRepo.getById(meetingsRequest.getMeetingId());
 		if(!usersService.isValidUser(request, meeting.getUseraid())) {
 			if(!usersService.isValidUser(request, meeting.getUserbid())) {
@@ -231,11 +231,11 @@ public class MeetingsService {
 		meeting.setMeetingstatus(Constants.COMPLETED);
 		meeting.setEndedat(DateTimeUtil.getCurrentUTCTime());
 		meetingsRepo.save(meeting);
-		return "OK";
+		return true;
 	}
 
 	/* Verifying whether the user is not accessing irrelevant data as well as not a banned user */
-	public void prevalidationOfJoinSession(HttpServletRequest request, UsersRequest usersRequest) throws Exception{
+	public boolean prevalidationOfJoinSession(HttpServletRequest request, UsersRequest usersRequest) throws Exception{
 		int userIdFromDashboard = usersRequest.getUserid();
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		if(userIdFromDashboard!=loggedinUserId) {
@@ -244,5 +244,6 @@ public class MeetingsService {
 		if(usersService.isBannedUser(loggedinUserId)) {
 			throw new Exception(Constants.BANNED_USER);
 		}
+		return true;
 	}
 }

@@ -57,7 +57,10 @@ public class UsersService {
 		interestsRepo.saveAll(interests);
 	}
 
-	public UsersResponse getUserDetails(HttpServletRequest request) {
+	public UsersResponse getUserDetails(HttpServletRequest request) throws Exception{
+		if(request==null) {
+			throw new Exception(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
+		}
 		int userId = userUtil.getLoggedInUserId(request);
 		LinkedList<Object[]> userDetails = usersRepo.findUserDetailsByUserid(userId);
 		List<String> interests = usersRepo.findInterestsByUserid(userId);

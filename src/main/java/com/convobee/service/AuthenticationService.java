@@ -59,14 +59,14 @@ public class AuthenticationService {
     @Value("${site.base.url.https}")
     private String baseURL;
 
-	public void signupAuthentication(UsersRequest usersRequest) throws Exception {
+	public boolean signupAuthentication(UsersRequest usersRequest) throws Exception {
 		//Inserting user in Users table
 		Users user = usersMapper.mapUserFromRequest(usersRequest);
 		usersService.createUser(user);
 		//Inserting interests in Interests table
 		List<Interests> interests = interestsMapper.mapInterestsFromRequest(user, usersRequest);
 		usersService.createInterestsForUser(interests);
-		sendRegistrationConfirmationEmail(user);
+		return sendRegistrationConfirmationEmail(user);
 	}
 	
     public boolean checkIfUserExist(String email) {
@@ -77,7 +77,7 @@ public class AuthenticationService {
      * 
      * Used the below guide and followed the mail sending feature
      * https://www.javadevjournal.com/spring-boot/send-email-using-spring/ */
-    public void sendRegistrationConfirmationEmail(Users user)  throws Exception{
+    public boolean sendRegistrationConfirmationEmail(Users user)  throws Exception{
 		final AuthUserDetails userDetails = userDetailsService.loadUserByUsername(user.getMailid());
 		final String jwt = jwtUtil.generateToken(userDetails);
         AccountVerificationEmailContext emailContext = new AccountVerificationEmailContext();
@@ -86,9 +86,11 @@ public class AuthenticationService {
         emailContext.buildVerificationUrl(baseURL, jwt);
         try {
             emailService.sendMail(emailContext);
+            return true;
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+        return false;
     }
     
     public boolean verifyUser(UsersRequest usersRequest) throws InvalidTokenException {

@@ -82,7 +82,7 @@ public class FeedbacksService {
 	
 	int count = 0;
 	
-	public void submitFeedback(HttpServletRequest request, FeedbacksRequest feedbacksRequest) throws Exception {
+	public boolean submitFeedback(HttpServletRequest request, FeedbacksRequest feedbacksRequest) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		Feedbacks feedback = feedbacksMapper.mapFeedbacks(feedbacksRequest, loggedinUserId);
 		feedbacksRepo.save(feedback);
@@ -90,12 +90,14 @@ public class FeedbacksService {
 		Optional<Users> user = usersRepo.findById(loggedinUserId);
 		user.get().setIsfeedbackgiven(true);
 		usersRepo.save(user.get());
+		return true;
 	}
 	
-	public void submitFeedbackToUs(HttpServletRequest request, FeedbacksToUsRequest feedbacksToUsRequest) throws Exception {
+	public boolean submitFeedbackToUs(HttpServletRequest request, FeedbacksToUsRequest feedbacksToUsRequest) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		FeedbacksToUs feedbacksToUs = feedbacksToUsMapper.mapFeedbacksToUs(feedbacksToUsRequest, loggedinUserId);
 		feedbacksToUsRepo.save(feedbacksToUs);
+		return true;
 	}
 	
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
