@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.BookedSlotsRequest;
+import com.convobee.api.rest.response.SessionResponse;
 import com.convobee.constants.Constants;
 import com.convobee.data.entity.BookedSlots;
 import com.convobee.data.mapper.BookedSlotsMapper;
@@ -37,7 +38,7 @@ public class BookedSlotsService {
 	@Autowired
 	UsersService usersService;
 	
-	public Map<String, Integer> bookSlot(HttpServletRequest request, int slotid) {
+	public LinkedList<SessionResponse> bookSlot(HttpServletRequest request, int slotid) {
 		int userid = userUtil.getLoggedInUserId(request);
 		BookedSlots bookedSlot = bookedSlotsMapper.mapBookedSlots(userid, slotid);
 		bookedSlotsRepo.save(bookedSlot);
@@ -45,14 +46,14 @@ public class BookedSlotsService {
 		//return bookedSlotAfterAddition.getBookedslotid();
 	}
 	
-	public Map<String, Integer> rescheduleBookedSlot(HttpServletRequest request, BookedSlotsRequest bookedSlotsRequest) throws Exception {
+	public LinkedList<SessionResponse> rescheduleBookedSlot(HttpServletRequest request, BookedSlotsRequest bookedSlotsRequest) throws Exception {
 		BookedSlots rescheduleBookedSlot = bookedSlotsMapper.mapBookedSlotsForReschedule(request, bookedSlotsRequest);
 		/* Handled the user has to reschedule only his data not others, we can achieve this through transaction rollback after persisting also */
 		bookedSlotsRepo.save(rescheduleBookedSlot);
 		return getUpcomingSessions(request);
 	}
 	
-	public Map<String, Integer> deleteBookedSlot(HttpServletRequest request, int bookedslotid) throws Exception {
+	public LinkedList<SessionResponse> deleteBookedSlot(HttpServletRequest request, int bookedslotid) throws Exception {
 		BookedSlots deleteBookedSlot = bookedSlotsRepo.getById(bookedslotid);
 		/* Handled the user has to delete only his data not others */
 		if(!usersService.isValidUser(request, deleteBookedSlot.getUsers())) {
@@ -63,18 +64,23 @@ public class BookedSlotsService {
 	}
 
 	/* Need to handle the 3 minutes delay for showing upcoming session*/
-	public Map<String, Integer> getUpcomingSessions(HttpServletRequest request) {
+	public LinkedList<SessionResponse> getUpcomingSessions(HttpServletRequest request) {
 		int userid = userUtil.getLoggedInUserId(request);
+		LinkedList<SessionResponse> sessionResponseList = new LinkedList<SessionResponse>(); 
 		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
 		//System.out.println("DATETIME = " + utc);
 		LinkedList<Object[]> listOfBookedslot = bookedSlotsRepo.findAllByUserid(userid, Timestamp.valueOf(utc.toLocalDateTime()));
 		Map<String, Integer> finalMap = new LinkedHashMap<String, Integer>(); 
 		int size = listOfBookedslot.size();
 		for(int i = 0; i<size ;i++) {
-			finalMap.put( String.valueOf(listOfBookedslot.get(i)[1].toString().replace('T', ' ')), Integer.valueOf(listOfBookedslot.get(i)[0].toString()));
+			SessionResponse sessionResponse = new SessionResponse();
+			sessionResponse.setBookedSlotId(Integer.valueOf(listOfBookedslot.get(i)[0].toString()));
+			sessionResponse.setSlotTime(listOfBookedslot.get(i)[1].toString().replace('T', ' '));
+			sessionResponseList.add(sessionResponse);
+			//finalMap.put( String.valueOf(), );
 		}
 		//System.out.println("Final result = " + finalMap);
-	    return finalMap;
+	    return sessionResponseList;
 	}
 	
 	

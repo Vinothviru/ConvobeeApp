@@ -61,9 +61,7 @@ public class AuthenticationAPI {
 	 * */
 	@RequestMapping(value = "/oauthsignup", method = RequestMethod.GET)
 	public ResponseEntity oauthSignup(@AuthenticationPrincipal OAuth2User principal) {
-		String username = (principal.getAttribute("name")).toString();
-		String mailid = (principal.getAttribute("email")).toString();
-		return  new BaseResponse().getResponse( ()-> new OauthResponseBuilder().buildResponse(username, mailid));
+		return  new BaseResponse().getResponse( ()-> authenticationService.oauthSignup(principal));
 	}
 
 	/*System.out.println((principal.getAttribute("name")).toString());

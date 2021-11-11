@@ -19,6 +19,7 @@ import java.util.stream.IntStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +57,12 @@ public class SlotsService {
 		2019-03-02 23:30:00
 	 * */
 
+    @Value("${slots.medium}")
+    private int mediumThreshold;
+    
+    @Value("${slots.high}")
+    private int highThreshold;
+    
 	public boolean addSlot(SlotsRequest slotsRequest) throws ParseException
 	{
 		List<Slots> slotsList = new ArrayList<Slots>();
@@ -182,10 +189,10 @@ public class SlotsService {
 				try {
 					if(!countofBookedSlots.isEmpty() && listOfIds.get(id).equals(countofBookedSlots.get(temp)[0])) {
 						int valueOfCount = Integer.valueOf(countofBookedSlots.get(temp)[1].toString());
-						if(valueOfCount>=1&&valueOfCount<2) {
+						if(valueOfCount>=mediumThreshold&&valueOfCount<highThreshold) {
 							pace = "medium";
 						}
-						else if(valueOfCount>=2&&valueOfCount<3) {
+						else if(valueOfCount>=highThreshold) {
 							pace = "high";
 						}
 						temp++;

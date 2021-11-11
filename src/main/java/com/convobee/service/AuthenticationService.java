@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.AuthenticationRequest;
 import com.convobee.api.rest.request.UsersRequest;
+import com.convobee.api.rest.response.JWTResponse;
+import com.convobee.api.rest.response.OAuthResponse;
+import com.convobee.api.rest.response.builder.OauthResponseBuilder;
 import com.convobee.authentication.AuthUserDetails;
 import com.convobee.authentication.AuthUserDetailsService;
 import com.convobee.data.entity.Interests;
@@ -115,8 +118,15 @@ public class AuthenticationService {
         return true;
     }
 
-
-	public String loginAuthentication(AuthenticationRequest authenticationRequest) throws Exception {
+    public OAuthResponse oauthSignup(OAuth2User principal) throws Exception {
+    	String username = (principal.getAttribute("name")).toString();
+    	String mailid = (principal.getAttribute("email")).toString();
+    	OAuthResponse oauthResponse = new OauthResponseBuilder().buildResponse(username, mailid);
+    	return oauthResponse;
+    }
+    
+	public JWTResponse loginAuthentication(AuthenticationRequest authenticationRequest) throws Exception {
+		JWTResponse jwtResponse = new JWTResponse();
 		final AuthUserDetails userDetails = usersService.authenticate(authenticationRequest);
 		try {
 			authenticationManager.authenticate(
@@ -127,16 +137,19 @@ public class AuthenticationService {
 			throw new Exception("Incorrect Username or Password", e);
 		}
 		final String jwt = jwtUtil.generateToken(userDetails);
-		return jwt;
+		jwtResponse.setJwt(jwt);
+		return jwtResponse;
 	}
 
-	public String oauthLoginAuthentication(OAuth2User principal) throws Exception {
+	public JWTResponse oauthLoginAuthentication(OAuth2User principal) throws Exception {
 		try {
+			JWTResponse jwtResponse = new JWTResponse();
 			String mailid = (principal.getAttribute("email")).toString();
 
 			final AuthUserDetails userDetails = userDetailsService.loadUserByUsername(mailid);
 			final String jwt = jwtUtil.generateToken(userDetails);
-			return jwt;
+			jwtResponse.setJwt(jwt);
+			return jwtResponse;
 		}
 		catch(BadCredentialsException e) {
 			throw new Exception("Incorrect Username or Password", e);

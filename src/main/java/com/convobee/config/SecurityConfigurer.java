@@ -78,7 +78,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 		.antMatchers("/verifyuser").permitAll()
 		.antMatchers("/login").permitAll()
 		.anyRequest().authenticated()
-        .and().exceptionHandling().accessDeniedHandler(accessDeniedHandler).authenticationEntryPoint(unauthorizedHandler)
+        .and().exceptionHandling().accessDeniedHandler(accessDeniedHandler).authenticationEntryPoint(unauthorizedHandler)/* https://www.devglan.com/spring-security/exception-handling-in-spring-security */
 //		
 //		.and()
 //        .exceptionHandling()
@@ -107,6 +107,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS);*/
 	}
 	
+	
+	/* https://www.baeldung.com/spring-security-multiple-entry-points */
 //	@Bean
 //	public AuthenticationEntryPoint loginUrlauthenticationEntryPoint(){
 //	   //return unauthorizedHandler;
