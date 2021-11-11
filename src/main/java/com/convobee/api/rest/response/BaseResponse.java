@@ -33,7 +33,7 @@ public class BaseResponse<T> {
         catch (Exception ex){
 
             this.statusCode = HttpStatus.INTERNAL_SERVER_ERROR.value();
-            this.statusMessage = ParseConstantsUtil.parse(Constants.EXCEPTION_OCCURED, ex.getLocalizedMessage())  ;
+            this.statusMessage =  ex.getLocalizedMessage() ;
             ResponseEntity<BaseResponse<T>> re = new ResponseEntity<BaseResponse<T>>(  this, HttpStatus.INTERNAL_SERVER_ERROR);
             return re;
         }

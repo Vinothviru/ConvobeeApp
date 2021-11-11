@@ -20,6 +20,7 @@ import com.convobee.api.rest.response.OAuthResponse;
 import com.convobee.api.rest.response.builder.OauthResponseBuilder;
 import com.convobee.authentication.AuthUserDetails;
 import com.convobee.authentication.AuthUserDetailsService;
+import com.convobee.constants.Constants;
 import com.convobee.data.entity.Interests;
 import com.convobee.data.entity.Users;
 import com.convobee.data.mapper.InterestsMapper;
@@ -31,7 +32,8 @@ import com.convobee.exception.InvalidTokenException;
 import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.JWTUtil;
 
-@Transactional
+/* https://stackoverflow.com/questions/33881648/springs-transactioninterceptor-overrides-my-exception */
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class AuthenticationService {
 
@@ -69,7 +71,14 @@ public class AuthenticationService {
 		//Inserting interests in Interests table
 		List<Interests> interests = interestsMapper.mapInterestsFromRequest(user, usersRequest);
 		usersService.createInterestsForUser(interests);
-		return sendRegistrationConfirmationEmail(user);
+		boolean isSuccess;
+		try {
+			isSuccess = sendRegistrationConfirmationEmail(user);
+		}
+		catch(Exception e) {
+		        throw new Exception(Constants.ALREADY_REGISTERED_USER);
+		}
+		return isSuccess;
 	}
 	
     public boolean checkIfUserExist(String email) {
