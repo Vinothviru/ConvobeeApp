@@ -42,7 +42,13 @@ public class Constants {
     /* Exception constants ends here */
     
     /* Timezone constants starts here */
-    public  static  final String  UTC = "UTC";
+    public  static  final String UTC = "UTC";
     /* Timezone constants ends here */
+    
+    /* Skill factors constants starts here */
+    public  static  final String CONFIDENCE = "Confidence";
+    public  static  final String PROFICIENCY = "Proficiency";
+    public  static  final String IMPRESSION = "Impression";
+    /* Skill factors constants ends here */
 }
 

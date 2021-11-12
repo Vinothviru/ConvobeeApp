@@ -3,9 +3,7 @@ package com.convobee.service;
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -63,23 +61,20 @@ public class BookedSlotsService {
 		return getUpcomingSessions(request);
 	}
 
-	/* Need to handle the 3 minutes delay for showing upcoming session*/
+	/* Handled the 2 minutes delay for showing upcoming session, purpose is to make the user to join session if they loggedin 2 minutes late also */
 	public LinkedList<SessionResponse> getUpcomingSessions(HttpServletRequest request) {
 		int userid = userUtil.getLoggedInUserId(request);
 		LinkedList<SessionResponse> sessionResponseList = new LinkedList<SessionResponse>(); 
 		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
-		//System.out.println("DATETIME = " + utc);
+		utc = utc.minusMinutes(3);//3 means, at backend query will check for extra 2 minutes only
 		LinkedList<Object[]> listOfBookedslot = bookedSlotsRepo.findAllByUserid(userid, Timestamp.valueOf(utc.toLocalDateTime()));
-		Map<String, Integer> finalMap = new LinkedHashMap<String, Integer>(); 
 		int size = listOfBookedslot.size();
 		for(int i = 0; i<size ;i++) {
 			SessionResponse sessionResponse = new SessionResponse();
 			sessionResponse.setBookedSlotId(Integer.valueOf(listOfBookedslot.get(i)[0].toString()));
 			sessionResponse.setSlotTime(listOfBookedslot.get(i)[1].toString().replace('T', ' '));
 			sessionResponseList.add(sessionResponse);
-			//finalMap.put( String.valueOf(), );
 		}
-		//System.out.println("Final result = " + finalMap);
 	    return sessionResponseList;
 	}
 	
