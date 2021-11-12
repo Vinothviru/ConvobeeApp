@@ -22,7 +22,7 @@ import com.convobee.data.repository.BookedSlotsRepo;
 import com.convobee.exception.UserValidationException;
 import com.convobee.utils.UserUtil;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class BookedSlotsService {
 

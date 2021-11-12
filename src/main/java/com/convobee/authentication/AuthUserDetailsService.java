@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.convobee.data.entity.Users;
 import com.convobee.data.repository.UsersRepo;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class AuthUserDetailsService implements UserDetailsService{
 	@Autowired

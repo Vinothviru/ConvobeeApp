@@ -35,7 +35,7 @@ import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.SlotUtil;
 import com.convobee.utils.UserUtil;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class SlotsService {
 
@@ -82,7 +82,7 @@ public class SlotsService {
 			//System.out.println(sdfs.format(new Date(dif)));
 			slot.setSlottime(Timestamp.valueOf(sdfs.format(new Date(dif))));
 			slot.setSloturl(CommonUtil.getRandomUrl());//Generating slots
-			slot.setCreatedat(Timestamp.valueOf("2020-01-01 19:30:00"));
+			slot.setCreatedat(DateTimeUtil.getCurrentUTCTime());
 			slotsList.add(slot);
 			dif += 3600000/2;
 		}

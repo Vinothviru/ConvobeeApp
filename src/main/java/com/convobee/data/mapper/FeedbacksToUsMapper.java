@@ -18,7 +18,7 @@ import com.convobee.data.repository.UsersRepo;
 import com.convobee.exception.UserValidationException;
 import com.convobee.utils.DateTimeUtil;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class FeedbacksToUsMapper {
 	@Autowired

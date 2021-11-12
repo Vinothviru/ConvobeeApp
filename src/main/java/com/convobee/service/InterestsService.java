@@ -11,7 +11,7 @@ import com.convobee.data.entity.InterestsNames;
 import com.convobee.data.mapper.InterestNamesMapper;
 import com.convobee.data.repository.InterestNamesRepo;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class InterestsService {
 	@Autowired

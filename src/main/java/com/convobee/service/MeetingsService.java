@@ -32,7 +32,7 @@ import com.convobee.utils.CommonUtil;
 import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.UserUtil;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class MeetingsService {
 

@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,7 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -38,7 +40,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService);
+		//auth.userDetailsService(userDetailsService);
+		auth.authenticationProvider(authProvider());
 	}
 
 	@Override
@@ -51,6 +54,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 //		.antMatchers("/default").permitAll()
 		.antMatchers("/addinterests").hasRole("ADMIN")
 		.antMatchers("/addslot").hasRole("ADMIN")
+		.antMatchers("/getdashboarddetails").hasAnyRole("USER","ADMIN")
 		.antMatchers("/showslots").hasAnyRole("USER","ADMIN")
 		.antMatchers("/bookslot").hasAnyRole("USER","ADMIN")
 		.antMatchers("/rescheduleslot").hasAnyRole("USER","ADMIN")
@@ -117,8 +121,17 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 
 	@Bean
 	public PasswordEncoder getPasswordEncoder() {
-		//return new BCryptPasswordEncoder();
-		return NoOpPasswordEncoder.getInstance();
+		return new BCryptPasswordEncoder();
+		//return NoOpPasswordEncoder.getInstance();
+	}
+	
+	/* https://www.baeldung.com/spring-security-registration-password-encoding-bcrypt */
+	@Bean
+	public DaoAuthenticationProvider authProvider() {
+	    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+	    authProvider.setUserDetailsService(userDetailsService);
+	    authProvider.setPasswordEncoder(getPasswordEncoder());
+	    return authProvider;
 	}
 
 	@Override

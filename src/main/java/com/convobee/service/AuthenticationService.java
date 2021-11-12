@@ -81,6 +81,7 @@ public class AuthenticationService {
 		return isSuccess;
 	}
 	
+	/* Unused method but may use in future */
     public boolean checkIfUserExist(String email) {
         return usersRepo.findByMailid(email)!=null ? true : false;
     }

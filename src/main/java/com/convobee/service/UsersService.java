@@ -9,6 +9,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,7 @@ import com.convobee.data.repository.UsersRepo;
 import com.convobee.utils.JWTUtil;
 import com.convobee.utils.UserUtil;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class UsersService {
 
@@ -46,6 +47,9 @@ public class UsersService {
 	
 	@Autowired
 	JWTUtil jwtUtil;
+	
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 	
 	public void createUser(Users user) throws Exception
 	{
@@ -94,7 +98,9 @@ public class UsersService {
 		if(authUserDetails==null) {
 			throw new Exception(Constants.NO_SUCH_USER);
 		}
-		if(!(authUserDetails.getPassword().equals(authenticationRequest.getPassword()))) {
+		if(!(passwordEncoder.matches(authenticationRequest.getPassword(), authUserDetails.getPassword()))) {
+			//authUserDetails.getPassword().equals(passwordEncoder.encode(authenticationRequest.getPassword()))
+			
 			throw new Exception(Constants.INCORRECT_PASSWORD);
 		}
 		if(isBannedUser(usersRepo.findByMailid(authUserDetails.getUsername()).get().getUserid())) {

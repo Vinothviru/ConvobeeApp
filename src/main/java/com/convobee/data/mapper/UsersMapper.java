@@ -1,5 +1,7 @@
 package com.convobee.data.mapper;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.convobee.api.rest.request.UsersRequest;
@@ -9,11 +11,14 @@ import com.convobee.utils.DateTimeUtil;
 @Service
 public class UsersMapper {
 	
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
 	public Users mapUserFromRequest(UsersRequest usersRequest) throws Exception{
 		Users user = new Users();
 		user.setUsername(usersRequest.getUsername());
 		user.setNickname(usersRequest.getNickname());
-		user.setPassword(usersRequest.getPassword());
+		user.setPassword(passwordEncoder.encode(usersRequest.getPassword()));
 		user.setMailid(usersRequest.getMailid());
 		user.setRole(usersRequest.getRole());
 		user.setCountry(usersRequest.getCountry());

@@ -16,7 +16,7 @@ import com.convobee.exception.UserValidationException;
 import com.convobee.service.UsersService;
 import com.convobee.utils.DateTimeUtil;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class BookedSlotsMapper {
 
