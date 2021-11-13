@@ -4,10 +4,11 @@ import com.convobee.api.rest.response.OAuthResponse;
 
 public class OauthResponseBuilder {
 
-	public OAuthResponse buildResponse(String username, String maild){
+	public OAuthResponse buildResponse(String username, String maild, String encryptedText){
 		OAuthResponse oauthResponse = OAuthResponse.builder() 
 										.username(username)
-										.mailid(maild).build();
+										.mailid(maild).
+										bvfhdjsk(encryptedText).build();
 		return oauthResponse;
 	}
 }

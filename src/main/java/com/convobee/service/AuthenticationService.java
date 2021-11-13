@@ -30,6 +30,7 @@ import com.convobee.email.AccountVerificationEmailContext;
 import com.convobee.email.DefaultEmailService;
 import com.convobee.exception.InvalidTokenException;
 import com.convobee.utils.DateTimeUtil;
+import com.convobee.utils.EncryptionUtil;
 import com.convobee.utils.JWTUtil;
 
 /* https://stackoverflow.com/questions/33881648/springs-transactioninterceptor-overrides-my-exception */
@@ -63,6 +64,9 @@ public class AuthenticationService {
     
     @Value("${site.base.url.https}")
     private String baseURL;
+    
+    @Value("${aes.secret.key}")
+    private String aesSecretKey;
 
 	public boolean signupAuthentication(UsersRequest usersRequest) throws Exception {
 		//Inserting user in Users table
@@ -71,6 +75,10 @@ public class AuthenticationService {
 		//Inserting interests in Interests table
 		List<Interests> interests = interestsMapper.mapInterestsFromRequest(user, usersRequest);
 		usersService.createInterestsForUser(interests);
+		String isFromOauthSignup = usersRequest.getBvfhdjsk();
+		if(isFromOauthSignup!=null&&!isFromOauthSignup.isEmpty()&&!isFromOauthSignup.isBlank()) {
+			return true;
+		}
 		boolean isSuccess;
 		try {
 			isSuccess = sendRegistrationConfirmationEmail(user);
@@ -131,7 +139,9 @@ public class AuthenticationService {
     public OAuthResponse oauthSignup(OAuth2User principal) throws Exception {
     	String username = (principal.getAttribute("name")).toString();
     	String mailid = (principal.getAttribute("email")).toString();
-    	OAuthResponse oauthResponse = new OauthResponseBuilder().buildResponse(username, mailid);
+    	/* https://howtodoinjava.com/java/java-security/java-aes-encryption-example/ */
+    	String encryptedText = EncryptionUtil.encrypt(mailid,aesSecretKey);
+    	OAuthResponse oauthResponse = new OauthResponseBuilder().buildResponse(username, mailid, encryptedText);
     	return oauthResponse;
     }
     

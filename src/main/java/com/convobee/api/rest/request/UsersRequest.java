@@ -22,5 +22,6 @@ public class UsersRequest {
 	private boolean isfeedback_given;
 	private List<String> interests;
 	private String token;
+	private String bvfhdjsk;
 	
 }
