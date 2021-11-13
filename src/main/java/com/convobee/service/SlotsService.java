@@ -9,12 +9,9 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
-import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,6 +24,7 @@ import com.convobee.api.rest.request.SlotsRequest;
 import com.convobee.api.rest.response.ShowSlotsFinalResponse;
 import com.convobee.api.rest.response.ShowSlotsResponse;
 import com.convobee.api.rest.response.SlotTimeResponse;
+import com.convobee.constants.Constants;
 import com.convobee.data.entity.Slots;
 import com.convobee.data.repository.BookedSlotsRepo;
 import com.convobee.data.repository.SlotsRepo;
@@ -66,11 +64,25 @@ public class SlotsService {
 	public boolean addSlot(SlotsRequest slotsRequest) throws ParseException
 	{
 		List<Slots> slotsList = new ArrayList<Slots>();
-		String firstDate = slotsRequest.getFromdate();//"28/02/2019";  
-		String firstTime = slotsRequest.getFromtime();//"05:30";
-		String secondDate = slotsRequest.getTodate();//"03/03/2019";
-		String secondTime = slotsRequest.getTotime();//"05:30";
-		String format = "dd/MM/yyyy hh:mm";
+		int daysToAdd = slotsRequest.getNumberOfDays();
+		LocalDateTime lastUpdatedDateTime = null;
+		LocalDate lastUpdatedDate = null;
+		
+		try {
+			lastUpdatedDateTime = slotsRepo.findLastSlotTime().toLocalDateTime();
+			lastUpdatedDate = lastUpdatedDateTime.toLocalDate();
+		}
+		/* Handled if no data is present in a table in catch block */
+		catch(Exception e) {
+			lastUpdatedDateTime = LocalDateTime.now();
+			lastUpdatedDate = lastUpdatedDateTime.toLocalDate().minusDays(1);
+		}
+		
+		String firstDate = lastUpdatedDate.plusDays(1).toString().replace('-', '/'); //slotsRequest.getFromdate();//"28/02/2019";  
+		String firstTime = "05:30";//slotsRequest.getFromtime();//"05:30";
+		String secondDate = lastUpdatedDate.plusDays(1+daysToAdd).toString().replace('-', '/');//slotsRequest.getTodate();//"03/03/2019";
+		String secondTime = "05:30";//slotsRequest.getTotime();//"05:30";
+		String format = "yyyy/MM/dd hh:mm";
 		SimpleDateFormat sdf = new SimpleDateFormat(format);
 		Date dateObj1 = sdf.parse(firstDate + " " + firstTime);
 		Date dateObj2 = sdf.parse(secondDate + " " + secondTime);
@@ -78,13 +90,12 @@ public class SlotsService {
 		while (dif < dateObj2.getTime()) {
 			Slots slot = new Slots();
 			SimpleDateFormat sdfs = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			sdfs.setTimeZone(TimeZone.getTimeZone("UTC"));
-			//System.out.println(sdfs.format(new Date(dif)));
+			sdfs.setTimeZone(TimeZone.getTimeZone(Constants.UTC));
 			slot.setSlottime(Timestamp.valueOf(sdfs.format(new Date(dif))));
 			slot.setSloturl(CommonUtil.getRandomUrl());//Generating slots
 			slot.setCreatedat(DateTimeUtil.getCurrentUTCTime());
 			slotsList.add(slot);
-			dif += 3600000/2;
+			dif += 3600000/2;/* For half an hour gap */
 		}
 		slotsRepo.saveAll(slotsList);
 		return true;
