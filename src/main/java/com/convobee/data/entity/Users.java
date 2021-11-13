@@ -30,7 +30,7 @@ public class Users {
 	@Column(name = "nick_name", length = 10)
 	@NotNull
 	private String nickname;
-	@Column(length = 15)
+	@Column(length = 80)
 	@NotNull
 	private String password;
 	@Column(name = "mail_id", length = 30, unique = true)

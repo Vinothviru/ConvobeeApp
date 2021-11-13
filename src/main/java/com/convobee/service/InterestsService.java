@@ -11,7 +11,7 @@ import com.convobee.data.entity.InterestsNames;
 import com.convobee.data.mapper.InterestNamesMapper;
 import com.convobee.data.repository.InterestNamesRepo;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class InterestsService {
 	@Autowired
@@ -20,8 +20,9 @@ public class InterestsService {
 	@Autowired
 	InterestNamesMapper interestNamesMapper;
 	
-	public void addInterests(InterestsRequest interestsRequest) throws Exception{
+	public boolean addInterests(InterestsRequest interestsRequest) throws Exception{
 		List<InterestsNames> interestsNamesList = interestNamesMapper.mapInterestNamesFromRequest(interestsRequest);
 		interestNamesRepo.saveAll(interestsNamesList);
+		return true;
 	}
 }

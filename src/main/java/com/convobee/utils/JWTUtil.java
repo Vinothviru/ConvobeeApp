@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -59,13 +61,22 @@ public class JWTUtil {
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis()+1000*60*60*10))
 				.signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
-				
-				
 	}
 	
 	public boolean validateToken(String token, AuthUserDetails userDetails) {
 		final String username = extractUsername(token);
-		return (username.equals(userDetails.getUsername())&&!isTokenExpired(token)&&userDetails.isEnabled());
+		return (username.equals(userDetails.getUsername()));
+		//return (username.equals(userDetails.getUsername())&&!isTokenExpired(token)&&userDetails.isEnabled()&&!usersService.isBannedUser(extractUserId(token)));
+	}
+	
+	public String extractJWT(HttpServletRequest request) {
+		final String authorizationHeader = request.getHeader("Authorization");
+		String jwt = null;
+		if(authorizationHeader!=null && authorizationHeader.startsWith("Bearer "))
+		{
+			jwt = authorizationHeader.substring(7);
+		}
+		return jwt;
 	}
 	
 }

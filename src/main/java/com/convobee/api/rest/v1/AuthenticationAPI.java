@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.convobee.api.rest.request.AuthenticationRequest;
 import com.convobee.api.rest.request.UsersRequest;
-import com.convobee.api.rest.response.AuthenticationResponse;
 import com.convobee.api.rest.response.BaseResponse;
 import com.convobee.api.rest.response.builder.OauthResponseBuilder;
 import com.convobee.data.entity.Users;
@@ -35,13 +34,13 @@ public class AuthenticationAPI {
 	AuthenticationService authenticationService; 
 
 	@RequestMapping(value = "/signup", method = RequestMethod.POST)
-	public void signupAndCreateAuthenticationToken(@RequestBody UsersRequest usersRequest) throws Exception{
-		authenticationService.signupAuthentication(usersRequest);
+	public ResponseEntity signupAndCreateAuthenticationToken(@RequestBody UsersRequest usersRequest) throws Exception{
+		return  new BaseResponse().getResponse( ()-> authenticationService.signupAuthentication(usersRequest));
 	}
 
 	@RequestMapping(value = "/verifyuser", method = RequestMethod.PUT)
-	public boolean verifyUser(@ModelAttribute UsersRequest usersRequest) throws Exception{
-		return authenticationService.verifyUser(usersRequest);
+	public ResponseEntity verifyUser(@ModelAttribute UsersRequest usersRequest) throws Exception{
+		return  new BaseResponse().getResponse( ()-> authenticationService.verifyUser(usersRequest));
 	}
 	
 	/**
@@ -51,19 +50,18 @@ public class AuthenticationAPI {
 	 * @return
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public ResponseEntity<?> loginAndCreateAuthenticationToken(@ModelAttribute AuthenticationRequest authenticationRequest) throws Exception{
-		String jwt = authenticationService.loginAuthentication(authenticationRequest);
-		return ResponseEntity.ok(new AuthenticationResponse(jwt));
+	public ResponseEntity loginAndCreateAuthenticationToken(@ModelAttribute AuthenticationRequest authenticationRequest) throws Exception{
+		return  new BaseResponse().getResponse( ()-> authenticationService.loginAuthentication(authenticationRequest));
+		//String jwt = authenticationService.loginAuthentication(authenticationRequest);
+		//return ResponseEntity.ok(new AuthenticationResponse(jwt));
 	}
 
 	/*
 	 * https://spring.io/guides/tutorials/spring-boot-oauth2/
 	 * */
 	@RequestMapping(value = "/oauthsignup", method = RequestMethod.GET)
-	public ResponseEntity<?> oauthSignup(@AuthenticationPrincipal OAuth2User principal) {
-		String username = (principal.getAttribute("name")).toString();
-		String mailid = (principal.getAttribute("email")).toString();
-		return new BaseResponse<Object>().getResponse( ()-> new OauthResponseBuilder().buildResponse(username, mailid));
+	public ResponseEntity oauthSignup(@AuthenticationPrincipal OAuth2User principal) {
+		return  new BaseResponse().getResponse( ()-> authenticationService.oauthSignup(principal));
 	}
 
 	/*System.out.println((principal.getAttribute("name")).toString());
@@ -72,8 +70,9 @@ public class AuthenticationAPI {
 
 	@RequestMapping(value = "/oauthlogin", method = RequestMethod.GET)
 	public ResponseEntity<?> oauthLoginAndCreateAuthenticationToken(@AuthenticationPrincipal OAuth2User principal) throws Exception{
-		String jwt = authenticationService.oauthLoginAuthentication(principal);
-		return ResponseEntity.ok(new AuthenticationResponse(jwt));
+		return  new BaseResponse().getResponse( ()-> authenticationService.oauthLoginAuthentication(principal));
+		//String jwt = authenticationService.oauthLoginAuthentication(principal);
+		//return ResponseEntity.ok(new AuthenticationResponse(jwt));
 	}
 
 	@RequestMapping(value = "/hello/{id}", method = RequestMethod.GET)

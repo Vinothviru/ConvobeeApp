@@ -2,6 +2,7 @@ package com.convobee.data.repository;
 
 import java.sql.Timestamp;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,6 @@ public interface BookedSlotsRepo extends JpaRepository<BookedSlots, Integer>{
 	
 	BookedSlots findSlotsByBookedslotid(int bookedslotid);
 	
+	@Query(value = "SELECT slot_id,count(*) FROM booked_slots where slot_id in :finalSlotIds group by slot_id",nativeQuery = true)
+	LinkedList<Object[]> findCountOfSlotsBySlotids(List<Integer> finalSlotIds);
 }

@@ -12,12 +12,7 @@ public class UserUtil {
 
 	public int getLoggedInUserId(HttpServletRequest request)
 	{
-		final String authorizationHeader = request.getHeader("Authorization");
-		String jwt = null;
-		if(authorizationHeader!=null && authorizationHeader.startsWith("Bearer "))
-		{
-			jwt = authorizationHeader.substring(7);
-		}
+		String jwt = jwtUtil.extractJWT(request);
 		return jwtUtil.extractUserId(jwt);
 	}
 }

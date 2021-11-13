@@ -15,8 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.AuthenticationRequest;
 import com.convobee.api.rest.request.UsersRequest;
+import com.convobee.api.rest.response.JWTResponse;
+import com.convobee.api.rest.response.OAuthResponse;
+import com.convobee.api.rest.response.builder.OauthResponseBuilder;
 import com.convobee.authentication.AuthUserDetails;
 import com.convobee.authentication.AuthUserDetailsService;
+import com.convobee.constants.Constants;
 import com.convobee.data.entity.Interests;
 import com.convobee.data.entity.Users;
 import com.convobee.data.mapper.InterestsMapper;
@@ -26,9 +30,11 @@ import com.convobee.email.AccountVerificationEmailContext;
 import com.convobee.email.DefaultEmailService;
 import com.convobee.exception.InvalidTokenException;
 import com.convobee.utils.DateTimeUtil;
+import com.convobee.utils.EncryptionUtil;
 import com.convobee.utils.JWTUtil;
 
-@Transactional
+/* https://stackoverflow.com/questions/33881648/springs-transactioninterceptor-overrides-my-exception */
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class AuthenticationService {
 
@@ -58,17 +64,32 @@ public class AuthenticationService {
     
     @Value("${site.base.url.https}")
     private String baseURL;
+    
+    @Value("${aes.secret.key}")
+    private String aesSecretKey;
 
-	public void signupAuthentication(UsersRequest usersRequest) throws Exception {
+	public boolean signupAuthentication(UsersRequest usersRequest) throws Exception {
 		//Inserting user in Users table
 		Users user = usersMapper.mapUserFromRequest(usersRequest);
 		usersService.createUser(user);
 		//Inserting interests in Interests table
 		List<Interests> interests = interestsMapper.mapInterestsFromRequest(user, usersRequest);
 		usersService.createInterestsForUser(interests);
-		sendRegistrationConfirmationEmail(user);
+		String isFromOauthSignup = usersRequest.getBvfhdjsk();
+		if(isFromOauthSignup!=null&&!isFromOauthSignup.isEmpty()&&!isFromOauthSignup.isBlank()) {
+			return true;
+		}
+		boolean isSuccess;
+		try {
+			isSuccess = sendRegistrationConfirmationEmail(user);
+		}
+		catch(Exception e) {
+		        throw new Exception(Constants.ALREADY_REGISTERED_USER);
+		}
+		return isSuccess;
 	}
 	
+	/* Unused method but may use in future */
     public boolean checkIfUserExist(String email) {
         return usersRepo.findByMailid(email)!=null ? true : false;
     }
@@ -77,7 +98,7 @@ public class AuthenticationService {
      * 
      * Used the below guide and followed the mail sending feature
      * https://www.javadevjournal.com/spring-boot/send-email-using-spring/ */
-    public void sendRegistrationConfirmationEmail(Users user)  throws Exception{
+    public boolean sendRegistrationConfirmationEmail(Users user)  throws Exception{
 		final AuthUserDetails userDetails = userDetailsService.loadUserByUsername(user.getMailid());
 		final String jwt = jwtUtil.generateToken(userDetails);
         AccountVerificationEmailContext emailContext = new AccountVerificationEmailContext();
@@ -86,9 +107,11 @@ public class AuthenticationService {
         emailContext.buildVerificationUrl(baseURL, jwt);
         try {
             emailService.sendMail(emailContext);
+            return true;
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+        return false;
     }
     
     public boolean verifyUser(UsersRequest usersRequest) throws InvalidTokenException {
@@ -113,8 +136,18 @@ public class AuthenticationService {
         return true;
     }
 
-
-	public String loginAuthentication(AuthenticationRequest authenticationRequest) throws Exception {
+    public OAuthResponse oauthSignup(OAuth2User principal) throws Exception {
+    	String username = (principal.getAttribute("name")).toString();
+    	String mailid = (principal.getAttribute("email")).toString();
+    	/* https://howtodoinjava.com/java/java-security/java-aes-encryption-example/ */
+    	String encryptedText = EncryptionUtil.encrypt(mailid,aesSecretKey);
+    	OAuthResponse oauthResponse = new OauthResponseBuilder().buildResponse(username, mailid, encryptedText);
+    	return oauthResponse;
+    }
+    
+	public JWTResponse loginAuthentication(AuthenticationRequest authenticationRequest) throws Exception {
+		JWTResponse jwtResponse = new JWTResponse();
+		final AuthUserDetails userDetails = usersService.authenticate(authenticationRequest);
 		try {
 			authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(authenticationRequest.getMailid(), authenticationRequest.getPassword())
@@ -123,18 +156,20 @@ public class AuthenticationService {
 		catch(BadCredentialsException e) {
 			throw new Exception("Incorrect Username or Password", e);
 		}
-		final AuthUserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getMailid());
 		final String jwt = jwtUtil.generateToken(userDetails);
-		return jwt;
+		jwtResponse.setJwt(jwt);
+		return jwtResponse;
 	}
 
-	public String oauthLoginAuthentication(OAuth2User principal) throws Exception {
+	public JWTResponse oauthLoginAuthentication(OAuth2User principal) throws Exception {
 		try {
+			JWTResponse jwtResponse = new JWTResponse();
 			String mailid = (principal.getAttribute("email")).toString();
 
 			final AuthUserDetails userDetails = userDetailsService.loadUserByUsername(mailid);
 			final String jwt = jwtUtil.generateToken(userDetails);
-			return jwt;
+			jwtResponse.setJwt(jwt);
+			return jwtResponse;
 		}
 		catch(BadCredentialsException e) {
 			throw new Exception("Incorrect Username or Password", e);

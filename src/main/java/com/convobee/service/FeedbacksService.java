@@ -43,7 +43,7 @@ import com.convobee.utils.CommonUtil;
 import com.convobee.utils.DateTimeUtil;
 import com.convobee.utils.UserUtil;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class FeedbacksService {
 
@@ -80,9 +80,7 @@ public class FeedbacksService {
 	@Autowired
 	InvalidPieChartResponseBuilder invalidPieChartResponseBuilder;
 	
-	int count = 0;
-	
-	public void submitFeedback(HttpServletRequest request, FeedbacksRequest feedbacksRequest) throws Exception {
+	public boolean submitFeedback(HttpServletRequest request, FeedbacksRequest feedbacksRequest) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		Feedbacks feedback = feedbacksMapper.mapFeedbacks(feedbacksRequest, loggedinUserId);
 		feedbacksRepo.save(feedback);
@@ -90,12 +88,14 @@ public class FeedbacksService {
 		Optional<Users> user = usersRepo.findById(loggedinUserId);
 		user.get().setIsfeedbackgiven(true);
 		usersRepo.save(user.get());
+		return true;
 	}
 	
-	public void submitFeedbackToUs(HttpServletRequest request, FeedbacksToUsRequest feedbacksToUsRequest) throws Exception {
+	public boolean submitFeedbackToUs(HttpServletRequest request, FeedbacksToUsRequest feedbacksToUsRequest) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		FeedbacksToUs feedbacksToUs = feedbacksToUsMapper.mapFeedbacksToUs(feedbacksToUsRequest, loggedinUserId);
 		feedbacksToUsRepo.save(feedbacksToUs);
+		return true;
 	}
 	
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
@@ -164,19 +164,19 @@ public class FeedbacksService {
 		DashboardPieChatResponse pieChartResponseList = new DashboardPieChatResponse(); 
 		
 		LinkedList<Object[]> confidenceLevel = feedbacksRepo.findConfidenceLevelByReceiveruser(loggedinUserId);
-		pieChartResponseList = processPieChartValues(confidenceLevel, rowCount, pieChartResponseList);
+		pieChartResponseList = processPieChartValues(confidenceLevel, rowCount, pieChartResponseList, Constants.CONFIDENCE);
 		
 		LinkedList<Object[]> proficiencyLevel = feedbacksRepo.findProficiencyLevelByReceiveruser(loggedinUserId);
-		pieChartResponseList = processPieChartValues(proficiencyLevel, rowCount, pieChartResponseList);
+		pieChartResponseList = processPieChartValues(proficiencyLevel, rowCount, pieChartResponseList, Constants.PROFICIENCY);
 		
 		LinkedList<Object[]> impressionLevel = feedbacksRepo.findImpressionLevelByReceiveruser(loggedinUserId);
-		pieChartResponseList = processPieChartValues(impressionLevel, rowCount, pieChartResponseList);
+		pieChartResponseList = processPieChartValues(impressionLevel, rowCount, pieChartResponseList, Constants.IMPRESSION);
 		
 		return pieChartResponseList;
 	}
-	
+
 	/* Double values cannot be done using switch case so implemented with else if */
-	public DashboardPieChatResponse  processPieChartValues(LinkedList<Object[]> result, int rowCount, DashboardPieChatResponse pieChartResponseList) throws Exception {
+	public DashboardPieChatResponse  processPieChartValues(LinkedList<Object[]> result, int rowCount, DashboardPieChatResponse pieChartResponseList, String skillType) throws Exception {
 		double oneStar = 0, twoStar = 0, threeStar = 0, fourStar = 0, fiveStar = 0;
 		for(int i = 0; i<result.size(); i++) {
 			if(result.get(i)[0] != null) {
@@ -197,15 +197,13 @@ public class FeedbacksService {
 				}
 			}
 		}
-		count++;
-		if(count==1) {
+		if(skillType.equals(Constants.CONFIDENCE)) {
 			pieChartResponseList.setConfidenceLevel(pieChartResponseBuilder.buildConfidenceResponse(oneStar, twoStar, threeStar, fourStar, fiveStar));
 		}
-			
-		else if(count==2)
+		else if(skillType.equals(Constants.PROFICIENCY)) {
 			pieChartResponseList.setProficiencyLevel(pieChartResponseBuilder.buildProficiencyResponse(oneStar, twoStar, threeStar, fourStar, fiveStar));
-		else if(count==3) {
-			count=0;
+		}
+		else if(skillType.equals(Constants.IMPRESSION)) {
 			pieChartResponseList.setImpressionLevel(pieChartResponseBuilder.buildImpressionResponse(oneStar, twoStar, threeStar, fourStar, fiveStar));
 		}
 		return pieChartResponseList;

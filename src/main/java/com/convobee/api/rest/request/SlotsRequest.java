@@ -4,9 +4,10 @@ import lombok.Data;
 
 @Data
 public class SlotsRequest {
-	private String fromdate;
-	private String fromtime;
-	private String todate;
-	private String totime;
+	//private String fromdate;
+	//private String fromtime;
+	//private String todate;
+	//private String totime;
+	private Integer numberOfDays;
 	private String timezone;
 }
