@@ -13,3 +13,15 @@ Steps to do after deploying build:
 {
 "interests":["blogging", "cooking", "dance", "gaming", "music", "pet care", "reading books", "sports", "technology", "traveling", "speak"]
 }
+
+
+
+Documents related to Convobee:
+
+Initial doc -> https://docs.google.com/document/d/17tS-evNOHsRp_qtwBYlrsNWEJ-XGXW6bmMjiVbGdUI4
+
+API Contract -> https://docs.google.com/spreadsheets/d/1wfSSGtuGSoqc8Z91-sOMoBX8ycVG7oz278BEFOSEc-g/edit#gid=0
+
+UX -> https://www.figma.com/proto/Cz0CzjgTTyK38zCqxRRkUZ/Untitled?page-id=0%3A1&node-id=156%3A236&viewport=241%2C48%2C0.31&scaling=min-zoom&starting-point-node-id=156%3A236
+
+Database -> https://online.visual-paradigm.com/community/share/convobee-erd-omufovdgl 
