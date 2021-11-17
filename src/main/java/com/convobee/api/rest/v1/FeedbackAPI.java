@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import com.convobee.api.rest.response.BaseResponse;
 import com.convobee.service.FeedbacksService;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:8081")
 public class FeedbackAPI {
 
 	@Autowired

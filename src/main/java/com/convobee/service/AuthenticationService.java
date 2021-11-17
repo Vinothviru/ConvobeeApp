@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.mail.MessagingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,6 +39,8 @@ import com.convobee.utils.JWTUtil;
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class AuthenticationService {
+	
+	Logger logger = LoggerFactory.getLogger(AuthenticationService.class); 
 
 	@Autowired
 	AuthenticationManager authenticationManager;
@@ -84,7 +88,8 @@ public class AuthenticationService {
 			isSuccess = sendRegistrationConfirmationEmail(user);
 		}
 		catch(Exception e) {
-		        throw new Exception(Constants.ALREADY_REGISTERED_USER);
+			logger.debug("Exception occured in signupAuthentication method", e);
+		    throw new Exception(Constants.ALREADY_REGISTERED_USER);
 		}
 		return isSuccess;
 	}

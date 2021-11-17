@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import com.convobee.api.rest.response.BaseResponse;
 import com.convobee.service.UsersService;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:8081")
 public class UserAPI {
 	
 	@Autowired

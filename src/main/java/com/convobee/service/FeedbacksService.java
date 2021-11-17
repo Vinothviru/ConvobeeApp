@@ -198,13 +198,31 @@ public class FeedbacksService {
 			}
 		}
 		if(skillType.equals(Constants.CONFIDENCE)) {
-			pieChartResponseList.setConfidenceLevel(pieChartResponseBuilder.buildConfidenceResponse(oneStar, twoStar, threeStar, fourStar, fiveStar));
+			LinkedList<Double> confidence = new LinkedList<Double>();
+			confidence.add(oneStar);
+			confidence.add(twoStar);
+			confidence.add(threeStar);
+			confidence.add(fourStar);
+			confidence.add(fiveStar);
+			pieChartResponseList.setConfidenceLevel(pieChartResponseBuilder.buildConfidenceResponse(confidence));
 		}
 		else if(skillType.equals(Constants.PROFICIENCY)) {
-			pieChartResponseList.setProficiencyLevel(pieChartResponseBuilder.buildProficiencyResponse(oneStar, twoStar, threeStar, fourStar, fiveStar));
+			LinkedList<Double> proficiency = new LinkedList<Double>();
+			proficiency.add(oneStar);
+			proficiency.add(twoStar);
+			proficiency.add(threeStar);
+			proficiency.add(fourStar);
+			proficiency.add(fiveStar);
+			pieChartResponseList.setProficiencyLevel(pieChartResponseBuilder.buildProficiencyResponse(proficiency));
 		}
 		else if(skillType.equals(Constants.IMPRESSION)) {
-			pieChartResponseList.setImpressionLevel(pieChartResponseBuilder.buildImpressionResponse(oneStar, twoStar, threeStar, fourStar, fiveStar));
+			LinkedList<Double> impression = new LinkedList<Double>();
+			impression.add(oneStar);
+			impression.add(twoStar);
+			impression.add(threeStar);
+			impression.add(fourStar);
+			impression.add(fiveStar);
+			pieChartResponseList.setImpressionLevel(pieChartResponseBuilder.buildImpressionResponse(impression));
 		}
 		return pieChartResponseList;
 	}
