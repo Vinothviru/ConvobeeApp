@@ -20,7 +20,7 @@ import com.convobee.api.rest.response.BaseResponse;
 import com.convobee.service.FeedbacksService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin
 public class FeedbackAPI {
 
 	@Autowired

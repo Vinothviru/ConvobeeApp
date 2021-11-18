@@ -19,7 +19,7 @@ import com.convobee.service.BookedSlotsService;
 import com.convobee.service.SlotsService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin
 public class SlotsAPI {
 	
 	@Autowired
@@ -36,13 +36,13 @@ public class SlotsAPI {
 	
 	@RequestMapping(value = "/showslots", method = RequestMethod.GET)
 	public ResponseEntity showSlots(HttpServletRequest request, @ModelAttribute SlotsRequest slotsRequest) throws Exception{
-		return  new BaseResponse().getResponse( ()-> slotsService.showSlots(request, slotsRequest.getTimezone()));
+		return  new BaseResponse().getResponse( ()-> slotsService.showSlots(request, slotsRequest.getTimeZone()));
 	}
 	
-	@RequestMapping(value = "/bookslot/{slotid}", method = RequestMethod.POST)
-	public ResponseEntity bookSlot(HttpServletRequest request, @PathVariable int slotid)
+	@RequestMapping(value = "/bookslot", method = RequestMethod.POST)
+	public ResponseEntity bookSlot(HttpServletRequest request, @ModelAttribute SlotsRequest slotsRequest)
 	{
-		return  new BaseResponse().getResponse( ()-> bookedSlotsService.bookSlot(request, slotid));
+		return  new BaseResponse().getResponse( ()-> bookedSlotsService.bookSlot(request, slotsRequest));
 	}
 	
 	@RequestMapping(value = "/rescheduleslot", method = RequestMethod.PUT)
@@ -51,16 +51,16 @@ public class SlotsAPI {
 		return  new BaseResponse().getResponse( ()-> bookedSlotsService.rescheduleBookedSlot(request,bookedSlotsRequest));
 	}
 	
-	@RequestMapping(value = "/deleteslot/{bookedslotid}", method = RequestMethod.DELETE)
-	public ResponseEntity deleteBookedSlot(HttpServletRequest request, @PathVariable int bookedslotid) throws Exception 
+	@RequestMapping(value = "/deleteslot", method = RequestMethod.DELETE)
+	public ResponseEntity deleteBookedSlot(HttpServletRequest request, @ModelAttribute BookedSlotsRequest bookedSlotsRequest) throws Exception 
 	{
-		return  new BaseResponse().getResponse( ()-> bookedSlotsService.deleteBookedSlot(request, bookedslotid));
+		return  new BaseResponse().getResponse( ()-> bookedSlotsService.deleteBookedSlot(request, bookedSlotsRequest));
 	}
 	
 	@RequestMapping(value = "/getupcomingsessions", method = RequestMethod.GET)
-	public ResponseEntity getUpcomingSessions(HttpServletRequest request) 
+	public ResponseEntity getUpcomingSessions(HttpServletRequest request, BookedSlotsRequest bookedSlotsRequest) 
 	{
-		return  new BaseResponse().getResponse( ()-> bookedSlotsService.getUpcomingSessions(request));
+		return  new BaseResponse().getResponse( ()-> bookedSlotsService.getUpcomingSessions(request, bookedSlotsRequest.getTimeZone()));
 		//System.out.println("Final result at API = " + slotList);
 	}
 }

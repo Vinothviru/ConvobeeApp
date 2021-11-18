@@ -13,7 +13,7 @@ import com.convobee.api.rest.response.BaseResponse;
 import com.convobee.service.UsersService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin
 public class UserAPI {
 	
 	@Autowired

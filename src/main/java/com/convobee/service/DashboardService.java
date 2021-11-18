@@ -34,7 +34,7 @@ public class DashboardService {
 	DashboardResponseBuilder dashboardResponseBuilder;
 	
 	public DashboardResponse getDashboardDetails(HttpServletRequest request, GraphLineChartRequest graphLineChartRequest) throws Exception {
-		LinkedList<SessionResponse> upcommingSessionResponse = bookedSlotsService.getUpcomingSessions(request);
+		LinkedList<SessionResponse> upcommingSessionResponse = bookedSlotsService.getUpcomingSessions(request, graphLineChartRequest.getTimeZone());
 		LinkedList<FeedbackHistoryResponse> feedbackHistoryResponse = feedbacksService.getFeedbackHistory(request);
 		GraphLineChartResponse graphLineChartResponse = feedbacksService.getGraphLineChart(request, graphLineChartRequest);
 		DashboardPieChatResponse dashboardPieChatResponse = feedbacksService.getPieChart(request);

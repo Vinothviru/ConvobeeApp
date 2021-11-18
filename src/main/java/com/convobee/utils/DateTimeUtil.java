@@ -8,6 +8,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+import com.convobee.constants.Constants;
+
 public class DateTimeUtil {
 	public static LocalDateTime backToLocal(LocalDateTime utc) {
 		final LocalDateTime backToLocal = DateTimeUtil.toZone(utc,ZoneOffset.UTC,ZoneId.systemDefault()); 
@@ -22,7 +24,7 @@ public class DateTimeUtil {
 	}
 
 	public static LocalDateTime toZone(final LocalDateTime time, final ZoneId toZone) {
-		return DateTimeUtil.toZone(time, ZoneId.systemDefault(), toZone);
+		return DateTimeUtil.toZone(time, ZoneId.of(Constants.UTC), toZone);
 	}
 
 	public static LocalDateTime toUtc(final LocalDateTime time, final ZoneId fromZone) {

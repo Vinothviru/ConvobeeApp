@@ -6,5 +6,5 @@ public class BookedSlotsRequest {
 
 	private int bookedslotid;
 	private int newslotid;
-	
+	private String timeZone;
 }

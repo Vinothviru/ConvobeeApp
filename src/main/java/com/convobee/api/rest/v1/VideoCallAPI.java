@@ -18,7 +18,7 @@ import com.convobee.exception.UserValidationException;
 import com.convobee.service.MeetingsService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin
 public class VideoCallAPI {
 
 	@Autowired

@@ -8,6 +8,7 @@ public class SlotsRequest {
 	//private String fromtime;
 	//private String todate;
 	//private String totime;
+	private Integer slotId;
 	private Integer numberOfDays;
-	private String timezone;
+	private String timeZone;
 }

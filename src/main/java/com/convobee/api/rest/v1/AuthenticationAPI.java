@@ -22,7 +22,7 @@ import com.convobee.data.repository.UsersRepo;
 import com.convobee.service.AuthenticationService;
 import com.convobee.utils.UserUtil;
 @RestController
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin
 public class AuthenticationAPI {
 
 	@Autowired

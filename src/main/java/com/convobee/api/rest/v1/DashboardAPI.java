@@ -15,7 +15,7 @@ import com.convobee.api.rest.response.BaseResponse;
 import com.convobee.service.DashboardService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin
 public class DashboardAPI {
 	
 	@Autowired
