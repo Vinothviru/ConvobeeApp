@@ -3,9 +3,11 @@ package com.convobee.service;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -190,7 +192,13 @@ public class SlotsService {
 		//LinkedList<LinkedList<SlotTimeResponse>> slotTimeResponseListFinal = new LinkedList<LinkedList<SlotTimeResponse>>();
 		for(int i = 0; i< 14; i++) {
 			ShowSlotsResponse showResponse = new ShowSlotsResponse();
-			showResponse.setDate(finalDate.get(i));
+			String tempDate = finalDate.get(i);
+			LocalDate ldt = LocalDate.parse(tempDate);
+			String month = Character.toUpperCase(ldt.getMonth().toString().toLowerCase().charAt(0))+ldt.getMonth().toString().substring(1,3).toLowerCase();
+			String date = String.valueOf(ldt.getDayOfMonth());
+			String day = Character.toUpperCase(String.valueOf(ldt.getDayOfWeek()).charAt(0))+ String.valueOf(ldt.getDayOfWeek()).substring(1, 3).toLowerCase();
+			String finalDateValue = month+" "+date+", "+day;
+			showResponse.setDate(finalDateValue);
 			LinkedList<SlotTimeResponse> slotTimeResponseList = new LinkedList<SlotTimeResponse>();
 			List<Integer> listOfIds = finalSlotIdsParts.get(i);
 			for(Integer id = 0; id<listOfIds.size() ; id++) {
