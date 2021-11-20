@@ -37,17 +37,17 @@ public class FeedbackAPI {
 	}
 	
 	@RequestMapping(value = "/getfeedbackhistory", method = RequestMethod.GET)
-	public ResponseEntity getFeedbackHistory(HttpServletRequest request) throws Exception{
-		return  new BaseResponse().getResponse( ()-> feedbacksService.getFeedbackHistory(request));
+	public ResponseEntity getFeedbackHistory(HttpServletRequest request, @ModelAttribute FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception{
+		return  new BaseResponse().getResponse( ()-> feedbacksService.getFeedbackHistory(request, feedbacksHistoryRequest.getTimeZone()));
 	}
 	
 	@RequestMapping(value = "/getfeedbackhistoryforconsecutiverequests", method = RequestMethod.GET)
-	public ResponseEntity getFeedbackHistoryForConsecutiveRequests(HttpServletRequest request, FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception{
+	public ResponseEntity getFeedbackHistoryForConsecutiveRequests(HttpServletRequest request, @ModelAttribute FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception{
 		return  new BaseResponse().getResponse( ()-> feedbacksService.getFeedbackHistoryForConsecutiveRequests(request, feedbacksHistoryRequest));
 	}
 	
 	@RequestMapping(value = "/getfeedbackhistoryforcustomrange", method = RequestMethod.GET)
-	public ResponseEntity getFeedbackHistoryForCustomRange(HttpServletRequest request, FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception{
+	public ResponseEntity getFeedbackHistoryForCustomRange(HttpServletRequest request, @ModelAttribute FeedbacksHistoryRequest feedbacksHistoryRequest) throws Exception{
 		return  new BaseResponse().getResponse( ()-> feedbacksService.getFeedbackHistoryForCustomRange(request, feedbacksHistoryRequest));
 	}
 	

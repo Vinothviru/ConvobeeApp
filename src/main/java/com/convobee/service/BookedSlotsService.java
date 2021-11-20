@@ -80,7 +80,6 @@ public class BookedSlotsService {
 			sessionResponse.setBookedSlotId(Integer.valueOf(listOfBookedslot.get(i)[0].toString()));
 			LocalDateTime ldt = LocalDateTime.parse(listOfBookedslot.get(i)[1].toString().replace(' ', 'T'));
 		    ldt = DateTimeUtil.toZone(ldt, ZoneId.of(timeZone));
-			//LocalDate ld = ldt.toLocalDate();
 			String month = Character.toUpperCase(ldt.getMonth().toString().toLowerCase().charAt(0))+ldt.getMonth().toString().substring(1,3).toLowerCase();
 			String date = String.valueOf(ldt.getDayOfMonth());
 			String day = Character.toUpperCase(String.valueOf(ldt.getDayOfWeek()).charAt(0))+ String.valueOf(ldt.getDayOfWeek()).substring(1, 3).toLowerCase();

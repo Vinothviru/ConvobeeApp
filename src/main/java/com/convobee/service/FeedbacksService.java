@@ -99,11 +99,11 @@ public class FeedbacksService {
 	}
 	
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
-	public LinkedList<FeedbackHistoryResponse> getFeedbackHistory(HttpServletRequest request) throws Exception {
+	public LinkedList<FeedbackHistoryResponse> getFeedbackHistory(HttpServletRequest request, String timeZone) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
 		LinkedList<String> listOfSlotTime = feedbacksRepo.findSlotTimeByUserId(loggedinUserId);
 		LinkedList<Object[]> nickNameAndfeedbackIdList = feedbacksRepo.findNickNamesAndfeedbackIdByUserId(loggedinUserId);
-		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList);
+		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList, timeZone);
 	}
 	
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using Query itself */
@@ -112,7 +112,7 @@ public class FeedbacksService {
 		int feedbackId = feedbacksHistoryRequest.getFeedbackId();
 		LinkedList<String> listOfSlotTime = feedbacksRepo.findSlotTimeByUserIdAndFeedbackId(loggedinUserId, feedbackId);
 		LinkedList<Object[]> nickNameAndfeedbackIdList = feedbacksRepo.findNickNamesAndfeedbackIdByUserIdAndFeedbackId(loggedinUserId, feedbackId);
-		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList);
+		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList, feedbacksHistoryRequest.getTimeZone());
 
 	}
 	
@@ -126,16 +126,23 @@ public class FeedbacksService {
 		String utcEndDateTime = DateTimeUtil.toUtc(LocalDateTime.parse(endDateTime), timeZone).toString().replace('T', ' ');
 		LinkedList<String> listOfSlotTime = feedbacksRepo.findSlotTimeByUserIdAndDateRange(loggedinUserId, utcStartDateTime, utcEndDateTime);
 		LinkedList<Object[]> nickNameAndfeedbackIdList = feedbacksRepo.findNickNamesAndfeedbackIdByUserIdAndDateRange(loggedinUserId, utcStartDateTime, utcEndDateTime);
-		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList);
+		return processFeedbackHistory(listOfSlotTime, nickNameAndfeedbackIdList, timeZone);
 	}
 	
 	/* Grouped two APIs -  getFeedbackHistory, getFeedbackHistoryForConsecutiveRequests */
-	public LinkedList<FeedbackHistoryResponse> processFeedbackHistory(LinkedList<String> listOfSlotTime, LinkedList<Object[]> nickNameAndfeedbackIdList) throws Exception {
+	public LinkedList<FeedbackHistoryResponse> processFeedbackHistory(LinkedList<String> listOfSlotTime, LinkedList<Object[]> nickNameAndfeedbackIdList, String timeZone) throws Exception {
 		int size = nickNameAndfeedbackIdList.size();
 		LinkedList<FeedbackHistoryResponse> feedbackHistoryResponse = new LinkedList<FeedbackHistoryResponse>();
 		for(int i = 0; i<size ;i++) {
 			FeedbackHistoryResponse feedbackHistory = new FeedbackHistoryResponse();
-			feedbackHistory.setSlotDateTime(listOfSlotTime.get(i).replace('T', ' '));
+			String dateTime = listOfSlotTime.get(i).replace(' ', 'T');
+			LocalDateTime ldt = LocalDateTime.parse(dateTime);
+		    ldt = DateTimeUtil.toZone(ldt, ZoneId.of(timeZone));
+			String month = Character.toUpperCase(ldt.getMonth().toString().toLowerCase().charAt(0))+ldt.getMonth().toString().substring(1,3).toLowerCase();
+			String date = String.valueOf(ldt.getDayOfMonth());
+			String day = Character.toUpperCase(String.valueOf(ldt.getDayOfWeek()).charAt(0))+ String.valueOf(ldt.getDayOfWeek()).substring(1, 3).toLowerCase();
+			String finalDateTime = day + ", " + month + " " + date + ", " + ldt.getYear() + " " + ldt.getHour()+":"+ldt.getMinute();
+			feedbackHistory.setSlotDateTime(finalDateTime);
 			feedbackHistory.setPeerNickName(nickNameAndfeedbackIdList.get(i)[0].toString());
 			feedbackHistory.setFeedbackId(Integer.valueOf(nickNameAndfeedbackIdList.get(i)[1].toString()));
 			feedbackHistoryResponse.add(feedbackHistory);
