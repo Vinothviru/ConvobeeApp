@@ -8,4 +8,5 @@ import lombok.Data;
 public class ShowSlotsFinalResponse {
 	LinkedList<ShowSlotsResponse> showResponseFinal;
 	private LinkedList<Integer> userBookedIds;
+	private Integer reschedulingSlotId;
 }

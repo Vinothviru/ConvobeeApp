@@ -253,9 +253,10 @@ public class SlotsService {
 	public ShowSlotsFinalResponse rescheduleShowSlots(HttpServletRequest request, BookedSlotsRequest bookedSlotsRequest) {
 		ShowSlotsFinalResponse showSlotsFinalResponse = showSlots(request, bookedSlotsRequest.getTimeZone());
 		LinkedList<Integer> userBookedIds = showSlotsFinalResponse.getUserBookedIds();
-		Integer bookedSlotId = bookedSlotsRepo.findSlotIdByBookedslotid(bookedSlotsRequest.getBookedslotid());
-		userBookedIds.removeFirstOccurrence(bookedSlotId);
+		Integer slotId = bookedSlotsRepo.findSlotIdByBookedslotid(bookedSlotsRequest.getBookedslotid());
+		userBookedIds.removeFirstOccurrence(slotId);
 		showSlotsFinalResponse.setUserBookedIds(userBookedIds);
+		showSlotsFinalResponse.setReschedulingSlotId(slotId);
 		return showSlotsFinalResponse;
 	}
 }
