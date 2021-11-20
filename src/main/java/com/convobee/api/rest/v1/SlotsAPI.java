@@ -39,6 +39,11 @@ public class SlotsAPI {
 		return  new BaseResponse().getResponse( ()-> slotsService.showSlots(request, slotsRequest.getTimeZone()));
 	}
 	
+	@RequestMapping(value = "/rescheduleshowslots", method = RequestMethod.GET)
+	public ResponseEntity showSlots(HttpServletRequest request, @ModelAttribute BookedSlotsRequest bookedSlotsRequest) throws Exception{
+		return  new BaseResponse().getResponse( ()-> slotsService.rescheduleShowSlots(request, bookedSlotsRequest));
+	}
+	
 	@RequestMapping(value = "/bookslot", method = RequestMethod.POST)
 	public ResponseEntity bookSlot(HttpServletRequest request, @ModelAttribute SlotsRequest slotsRequest)
 	{

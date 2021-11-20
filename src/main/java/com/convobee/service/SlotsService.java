@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.convobee.api.rest.request.BookedSlotsRequest;
 import com.convobee.api.rest.request.SlotsRequest;
 import com.convobee.api.rest.response.ShowSlotsFinalResponse;
 import com.convobee.api.rest.response.ShowSlotsResponse;
@@ -246,5 +247,15 @@ public class SlotsService {
 	        );
 	    }
 	    return parts;
+	}
+
+
+	public ShowSlotsFinalResponse rescheduleShowSlots(HttpServletRequest request, BookedSlotsRequest bookedSlotsRequest) {
+		ShowSlotsFinalResponse showSlotsFinalResponse = showSlots(request, bookedSlotsRequest.getTimeZone());
+		LinkedList<Integer> userBookedIds = showSlotsFinalResponse.getUserBookedIds();
+		Integer bookedSlotId = bookedSlotsRepo.findSlotIdByBookedslotid(bookedSlotsRequest.getBookedslotid());
+		userBookedIds.removeFirstOccurrence(bookedSlotId);
+		showSlotsFinalResponse.setUserBookedIds(userBookedIds);
+		return showSlotsFinalResponse;
 	}
 }

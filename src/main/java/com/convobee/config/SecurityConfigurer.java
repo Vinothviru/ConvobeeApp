@@ -56,6 +56,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 		.antMatchers("/addslot").hasRole("ADMIN")
 		.antMatchers("/getdashboarddetails").hasAnyRole("USER","ADMIN")
 		.antMatchers("/showslots").hasAnyRole("USER","ADMIN")
+		.antMatchers("/rescheduleshowslots").hasAnyRole("USER","ADMIN")
 		.antMatchers("/bookslot").hasAnyRole("USER","ADMIN")
 		.antMatchers("/rescheduleslot").hasAnyRole("USER","ADMIN")
 		.antMatchers("/deleteslot").hasAnyRole("USER","ADMIN")
