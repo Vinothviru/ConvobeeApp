@@ -166,22 +166,25 @@ public class FeedbacksService {
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
 	public DashboardPieChatResponse getPieChart(HttpServletRequest request) throws Exception {
 		int loggedinUserId = userUtil.getLoggedInUserId(request);
-		int rowCount = feedbacksRepo.findTotalRowsByReceiveruserid(loggedinUserId);
+		return getPieChart(loggedinUserId);
+	}
+	
+	public DashboardPieChatResponse getPieChart(int userId) throws Exception {
+		int rowCount = feedbacksRepo.findTotalRowsByReceiveruserid(userId);
 		
 		DashboardPieChatResponse pieChartResponseList = new DashboardPieChatResponse(); 
 		
-		LinkedList<Object[]> confidenceLevel = feedbacksRepo.findConfidenceLevelByReceiveruser(loggedinUserId);
+		LinkedList<Object[]> confidenceLevel = feedbacksRepo.findConfidenceLevelByReceiveruser(userId);
 		pieChartResponseList = processPieChartValues(confidenceLevel, rowCount, pieChartResponseList, Constants.CONFIDENCE);
 		
-		LinkedList<Object[]> proficiencyLevel = feedbacksRepo.findProficiencyLevelByReceiveruser(loggedinUserId);
+		LinkedList<Object[]> proficiencyLevel = feedbacksRepo.findProficiencyLevelByReceiveruser(userId);
 		pieChartResponseList = processPieChartValues(proficiencyLevel, rowCount, pieChartResponseList, Constants.PROFICIENCY);
 		
-		LinkedList<Object[]> impressionLevel = feedbacksRepo.findImpressionLevelByReceiveruser(loggedinUserId);
+		LinkedList<Object[]> impressionLevel = feedbacksRepo.findImpressionLevelByReceiveruser(userId);
 		pieChartResponseList = processPieChartValues(impressionLevel, rowCount, pieChartResponseList, Constants.IMPRESSION);
 		
 		return pieChartResponseList;
-	}
-
+		}
 	/* Double values cannot be done using switch case so implemented with else if */
 	public DashboardPieChatResponse  processPieChartValues(LinkedList<Object[]> result, int rowCount, DashboardPieChatResponse pieChartResponseList, String skillType) throws Exception {
 		double oneStar = 0, twoStar = 0, threeStar = 0, fourStar = 0, fiveStar = 0;
@@ -205,33 +208,28 @@ public class FeedbacksService {
 			}
 		}
 		if(skillType.equals(Constants.CONFIDENCE)) {
-			LinkedList<Double> confidence = new LinkedList<Double>();
-			confidence.add(oneStar);
-			confidence.add(twoStar);
-			confidence.add(threeStar);
-			confidence.add(fourStar);
-			confidence.add(fiveStar);
+			LinkedList<Double> confidence = processStarSkill(oneStar, twoStar, threeStar, fourStar, fiveStar);
 			pieChartResponseList.setConfidenceLevel(pieChartResponseBuilder.buildConfidenceResponse(confidence));
 		}
 		else if(skillType.equals(Constants.PROFICIENCY)) {
-			LinkedList<Double> proficiency = new LinkedList<Double>();
-			proficiency.add(oneStar);
-			proficiency.add(twoStar);
-			proficiency.add(threeStar);
-			proficiency.add(fourStar);
-			proficiency.add(fiveStar);
+			LinkedList<Double> proficiency = processStarSkill(oneStar, twoStar, threeStar, fourStar, fiveStar);
 			pieChartResponseList.setProficiencyLevel(pieChartResponseBuilder.buildProficiencyResponse(proficiency));
 		}
 		else if(skillType.equals(Constants.IMPRESSION)) {
-			LinkedList<Double> impression = new LinkedList<Double>();
-			impression.add(oneStar);
-			impression.add(twoStar);
-			impression.add(threeStar);
-			impression.add(fourStar);
-			impression.add(fiveStar);
+			LinkedList<Double> impression = processStarSkill(oneStar, twoStar, threeStar, fourStar, fiveStar);
 			pieChartResponseList.setImpressionLevel(pieChartResponseBuilder.buildImpressionResponse(impression));
 		}
 		return pieChartResponseList;
+	}
+	
+	public LinkedList<Double> processStarSkill(double oneStar, double twoStar, double threeStar, double fourStar, double fiveStar) throws Exception {
+		LinkedList<Double> skill = new LinkedList<Double>();
+		skill.add(oneStar);
+		skill.add(twoStar);
+		skill.add(threeStar);
+		skill.add(fourStar);
+		skill.add(fiveStar);
+		return skill;
 	}
 	
 	/* No need of user validation here because no param is passed from request exclusively. It is handled using JWT itself */
@@ -533,6 +531,25 @@ public class FeedbacksService {
 				proficiencyDatalist.add(0.0);
 			}
 			
+		}
+		GraphLineChartResponse graphLineChartResponse = graphLineChartResponseBuilder.buildResponse(confidenceDatalist, impressionDatalist, proficiencyDatalist);
+		return graphLineChartResponse;
+	}
+	
+	/* Unused because this will be directly used from ShareProfileService, just for safer side added this method */
+	public GraphLineChartResponse getOverallGraphLineChart(HttpServletRequest request) throws Exception {
+		int loggedinUserId = userUtil.getLoggedInUserId(request);
+		return getOverallGraphLineChart(loggedinUserId);
+	}
+	public GraphLineChartResponse getOverallGraphLineChart(int userId) throws Exception {
+		LinkedList<Double> confidenceDatalist = new LinkedList<Double>();
+		LinkedList<Double> impressionDatalist = new LinkedList<Double>();
+		LinkedList<Double> proficiencyDatalist = new LinkedList<Double>();
+		LinkedList<Object[]> skillFactors = feedbacksRepo.findOverAllSkillFactors(userId);
+		for(int i=0; i<skillFactors.size(); i++) {
+			confidenceDatalist.add(Double.valueOf(skillFactors.get(i)[0].toString()));
+			impressionDatalist.add(Double.valueOf(skillFactors.get(i)[1].toString()));
+			proficiencyDatalist.add(Double.valueOf(skillFactors.get(i)[2].toString()));
 		}
 		GraphLineChartResponse graphLineChartResponse = graphLineChartResponseBuilder.buildResponse(confidenceDatalist, impressionDatalist, proficiencyDatalist);
 		return graphLineChartResponse;

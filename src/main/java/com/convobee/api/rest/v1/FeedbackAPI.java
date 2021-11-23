@@ -71,6 +71,11 @@ public class FeedbackAPI {
 		return  new BaseResponse().getResponse( ()-> feedbacksService.getGraphLineChartForYear(request, graphLineChartRequest));
 	}
 	
+	/* Unused because this will be directly used from ShareProfileAPI, just for safer side added this method */
+	@RequestMapping(value = "/getoverallgraphlinechart", method = RequestMethod.GET)
+	public ResponseEntity getOverallGraphLineChart(HttpServletRequest request) throws Exception {
+		return  new BaseResponse().getResponse( ()-> feedbacksService.getOverallGraphLineChart(request));
+	}
 	
 	@RequestMapping(value = "/getpiechartinvalid", method = RequestMethod.GET)
 	public ResponseEntity getPieChartInvalid(HttpServletRequest request) throws Exception{

@@ -51,6 +51,9 @@ public interface FeedbacksRepo extends JpaRepository<Feedbacks, Integer>{
 	@Query(value = "select confidence_level as confidence, impression_level as impression, proficiency_level as proficiency from feedbacks where meeting_id in (select meeting_id from meetings cm inner join slots as cs on cs.slot_id=cm.slot_id and (user_a_id=:userId or user_b_id=:userId) and slot_time between :startTime and :endTime) and receiver_user_id=:userId group by confidence,impression,proficiency",nativeQuery = true)
 	LinkedList<Object[]> findSkillFactorsByUserIdAndDateTime(int userId, String startTime, String endTime);
 	
+	@Query(value = "select confidence_level, impression_level, proficiency_level from feedbacks where receiver_user_id=:userId",nativeQuery = true)
+	LinkedList<Object[]> findOverAllSkillFactors(int userId);
+	
 	/* This has become a unused query :joy */
 	@Query(value = "select avg(proficiency_level),avg(confidence_level),avg(impression_level) from feedbacks where receiver_user_id=:userId",nativeQuery = true)
 	LinkedList<Object[]> findAllByReceiveruser(int userId);

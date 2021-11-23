@@ -96,7 +96,8 @@ public class AuthenticationService {
 	
 	/* Unused method but may use in future */
     public boolean checkIfUserExist(String email) {
-        return usersRepo.findByMailid(email)!=null ? true : false;
+        boolean isAvailable =  usersRepo.findByMailid(email).get()!=null ? true : false;
+        return isAvailable;
     }
 
     /* 
@@ -142,12 +143,24 @@ public class AuthenticationService {
     }
 
     public OAuthResponse oauthSignup(OAuth2User principal) throws Exception {
-    	String username = (principal.getAttribute("name")).toString();
-    	String mailid = (principal.getAttribute("email")).toString();
-    	/* https://howtodoinjava.com/java/java-security/java-aes-encryption-example/ */
-    	String encryptedText = EncryptionUtil.encrypt(mailid,aesSecretKey);
-    	OAuthResponse oauthResponse = new OauthResponseBuilder().buildResponse(username, mailid, encryptedText);
-    	return oauthResponse;
+    		String username = (principal.getAttribute("name")).toString();
+        	String mailid = (principal.getAttribute("email")).toString();
+        	try {
+        		if(checkIfUserExist(mailid)) {
+        			throw new Exception(Constants.ALREADY_REGISTERED_USER);
+        		}
+        	}
+        	catch (Exception e) {
+    			// TODO: handle exception
+        		if(e.getMessage().equals(Constants.ALREADY_REGISTERED_USER)) {
+        			throw e;
+        		}
+    		}
+        	/* https://howtodoinjava.com/java/java-security/java-aes-encryption-example/ */
+        	String encryptedText = EncryptionUtil.encrypt(mailid,aesSecretKey);
+        	OAuthResponse oauthResponse = new OauthResponseBuilder().buildResponse(username, mailid, encryptedText);
+        	return oauthResponse;
+
     }
     
 	public JWTResponse loginAuthentication(AuthenticationRequest authenticationRequest) throws Exception {
