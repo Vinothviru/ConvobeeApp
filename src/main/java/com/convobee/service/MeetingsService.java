@@ -107,21 +107,26 @@ public class MeetingsService {
 		List<Integer> listOfUsers = meetingsRequest.getListOfUserIds();
 		List<MeetingResponse> meetingResponseList = new LinkedList<MeetingResponse>();
 		List<LinkedList<String>> listOfUserInterests = new LinkedList<LinkedList<String>>();
+		//NEED TO OPTIMIZE THIS SINCE THERE ARE MULTIPLE DB QUERIES
 		for(Integer i=0; i<listOfUsers.size(); i++)
 		{
 			listOfUserInterests.add(interestsRepo.findInterestByUser(listOfUsers.get(i)));
 		}
 		int sizeOfInterestsList = listOfUserInterests.size();
 		LinkedList<Integer> mismatchUser = new LinkedList<Integer>();
+		//user-a -> x, y, z list1
+		//user-b -> p, x, y list2
+		//afterCompare -> x, y
+		//O(n^2 Log n)
 		for(int i=0; i<sizeOfInterestsList; i++) {
 			int flag = 0;
 			LinkedList<Integer> userVsOppUser = new LinkedList<Integer>();
 			List<String> list1 = listOfUserInterests.get(i);
 			for(int j=i+1; j<sizeOfInterestsList;j++) {
 				List<String> list2 = listOfUserInterests.get(j);
-				System.out.println("list1 = " + list1);
-				System.out.println("list2 = " + list2);
-				System.out.println();
+//				System.out.println("list1 = " + list1);
+//				System.out.println("list2 = " + list2);
+//				System.out.println();
 				/* Comparing 2 lists and finding out the similar interests between them */
 				List<String> afterCompare = list1.stream().filter(list2::contains).collect(Collectors.toList());
 				

@@ -77,7 +77,8 @@ public class BookedSlotsService {
 		int size = listOfBookedslot.size();
 		for(int i = 0; i<size ;i++) {
 			SessionResponse sessionResponse = new SessionResponse();
-			sessionResponse.setBookedSlotId(Integer.valueOf(listOfBookedslot.get(i)[0].toString()));
+			int bookedSlotId = Integer.valueOf(listOfBookedslot.get(i)[0].toString());
+			sessionResponse.setBookedSlotId(bookedSlotId);
 			LocalDateTime ldt = LocalDateTime.parse(listOfBookedslot.get(i)[1].toString().replace(' ', 'T'));
 		    ldt = DateTimeUtil.toZone(ldt, ZoneId.of(timeZone));
 			String month = Character.toUpperCase(ldt.getMonth().toString().toLowerCase().charAt(0))+ldt.getMonth().toString().substring(1,3).toLowerCase();
@@ -85,6 +86,7 @@ public class BookedSlotsService {
 			String day = Character.toUpperCase(String.valueOf(ldt.getDayOfWeek()).charAt(0))+ String.valueOf(ldt.getDayOfWeek()).substring(1, 3).toLowerCase();
 			String finalDateTimeValue = day+", "+month+" "+date+" "+ldt.getYear()+" "+ldt.getHour()+":"+ldt.getMinute();
 			sessionResponse.setSlotTime(finalDateTimeValue);
+			sessionResponse.setSlotId(bookedSlotsRepo.findSlotIdByBookedslotid(bookedSlotId));
 			sessionResponseList.add(sessionResponse);
 		}
 	    return sessionResponseList;
