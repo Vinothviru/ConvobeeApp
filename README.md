@@ -14,6 +14,7 @@ Steps to do after deploying build:
 "interests":["blogging", "cooking", "dance", "gaming", "music", "pet care", "reading books", "sports", "technology", "traveling", "speak"]
 }
 
+3. Use this document for lombok installation - https://stackoverflow.com/questions/65017414/mac-os-lombok-installation-in-sts
 
 
 Documents related to Convobee:
