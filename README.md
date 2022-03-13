@@ -16,6 +16,7 @@ Steps to do after deploying build:
 
 3. Use this document for lombok installation - https://stackoverflow.com/questions/65017414/mac-os-lombok-installation-in-sts
 
+4. Use this video to setup Mysql in laptop - https://www.youtube.com/watch?v=-BDbOOY9jsc&ab_channel=AmitThinks
 
 Documents related to Convobee:
 
