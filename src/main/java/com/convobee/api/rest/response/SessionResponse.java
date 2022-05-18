@@ -7,4 +7,5 @@ public class SessionResponse {
 	private Integer slotId;
 	private Integer bookedSlotId;
 	private String SlotTime;
+	private Integer meetingId;
 }

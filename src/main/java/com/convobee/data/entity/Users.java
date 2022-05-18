@@ -33,7 +33,7 @@ public class Users {
 	@Column(length = 80)
 	@NotNull
 	private String password;
-	@Column(name = "mail_id", length = 30, unique = true)
+	@Column(name = "mail_id", length = 50, unique = true)
 	@NotNull
 	private String mailid;
 	@Column(length = 20)

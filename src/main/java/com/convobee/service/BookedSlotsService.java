@@ -67,12 +67,21 @@ public class BookedSlotsService {
 		return getUpcomingSessions(request, bookedSlotsRequest.getTimeZone());
 	}
 
-	/* Handled the 2 minutes delay for showing upcoming session, purpose is to make the user to join session if they loggedin 2 minutes late also */
+	/* Handled the 2 minutes delay for showing upcoming session, purpose is to make the user to join session if they loggedin 2 minutes late */
 	public LinkedList<SessionResponse> getUpcomingSessions(HttpServletRequest request, String timeZone) {
 		int userid = userUtil.getLoggedInUserId(request);
 		LinkedList<SessionResponse> sessionResponseList = new LinkedList<SessionResponse>(); 
 		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
-		utc = utc.minusMinutes(3);//3 means, at backend query will check for extra 2 minutes only
+		
+		Integer meeting_id =  bookedSlotsRepo.findMeetingIdByStatusOfUser(userid, Timestamp.valueOf(utc.minusMinutes(59).toLocalDateTime()));
+		/* If meeting_started_at value is not null then it means that the user is still on the meeting and can join again within 58 mins */
+		if(meeting_id!=null) {
+			utc = utc.minusMinutes(59);//59 means, at backend query will check for extra 59 minutes only
+		}
+		else {
+			utc = utc.minusMinutes(3);//3 means, at backend query will check for extra 2 minutes only
+		}
+		
 		LinkedList<Object[]> listOfBookedslot = bookedSlotsRepo.findAllByUserid(userid, Timestamp.valueOf(utc.toLocalDateTime()));
 		int size = listOfBookedslot.size();
 		for(int i = 0; i<size ;i++) {
@@ -87,6 +96,12 @@ public class BookedSlotsService {
 			String finalDateTimeValue = day+", "+month+" "+date+" "+ldt.getYear()+" "+ldt.getHour()+":"+ldt.getMinute();
 			sessionResponse.setSlotTime(finalDateTimeValue);
 			sessionResponse.setSlotId(bookedSlotsRepo.findSlotIdByBookedslotid(bookedSlotId));
+			if(i==0 && meeting_id!=null) {
+				sessionResponse.setMeetingId(meeting_id);
+			}
+			else {
+				sessionResponse.setMeetingId(null);
+			}
 			sessionResponseList.add(sessionResponse);
 		}
 	    return sessionResponseList;
