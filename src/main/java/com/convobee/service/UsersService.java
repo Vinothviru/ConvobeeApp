@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.convobee.api.rest.request.AuthenticationRequest;
+import com.convobee.api.rest.request.UsersRequest;
 import com.convobee.api.rest.response.UsersResponse;
 import com.convobee.api.rest.response.builder.UsersResponseBuilder;
 import com.convobee.authentication.AuthUserDetails;
@@ -21,6 +22,8 @@ import com.convobee.authentication.AuthUserDetailsService;
 import com.convobee.constants.Constants;
 import com.convobee.data.entity.Interests;
 import com.convobee.data.entity.Users;
+import com.convobee.data.mapper.InterestsMapper;
+import com.convobee.data.mapper.UsersMapper;
 import com.convobee.data.repository.InterestsRepo;
 import com.convobee.data.repository.UsersRepo;
 import com.convobee.utils.JWTUtil;
@@ -48,6 +51,12 @@ public class UsersService {
 	@Autowired
 	JWTUtil jwtUtil;
 	
+	@Autowired
+	UsersMapper usersMapper;
+	
+	@Autowired
+	InterestsMapper interestsMapper;
+	
     @Autowired
     private PasswordEncoder passwordEncoder;
 	
@@ -61,18 +70,39 @@ public class UsersService {
 		interestsRepo.saveAll(interests);
 	}
 
-	public UsersResponse getUserDetails(HttpServletRequest request) throws Exception{
+	public UsersResponse getUserDetails(HttpServletRequest request) throws Exception {
 		if(request==null) {
 			throw new Exception(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
 		}
 		int userId = userUtil.getLoggedInUserId(request);
+		return getUsersResponse(userId);
+	}
+	
+	public UsersResponse updateUserDetails(UsersRequest usersRequest) throws Exception {
+		Users user = usersMapper.mapUserFromRequestForUpdate(usersRequest);
+		usersRepo.save(user);
+		//Deleting interests from Interests table
+		if(usersRequest.getDeleted_interests()!=null) {
+			interestsRepo.deleteInterestsByUserid(usersRequest.getDeleted_interests(), usersRequest.getUserid());
+		}
+		//Inserting new interests in Interests table
+		if(usersRequest.getInterests()!=null) {
+			List<Interests> interests = interestsMapper.mapInterestsFromRequest(user, usersRequest);
+			createInterestsForUser(interests);
+		}
+		return getUsersResponse(user.getUserid());
+	}
+	
+	public UsersResponse getUsersResponse(int userId) throws Exception {
 		LinkedList<Object[]> userDetails = usersRepo.findUserDetailsByUserid(userId);
 		List<String> interests = usersRepo.findInterestsByUserid(userId);
 		UsersResponse usersResponse = null;
 		usersResponse = usersResponseBuilder.buildResponse(userDetails.get(0)[0].toString(),
 				userDetails.get(0)[1].toString(), userDetails.get(0)[2].toString(), 
 				userDetails.get(0)[3].toString(), userDetails.get(0)[4].toString(), 
-				userDetails.get(0)[5].toString(), userDetails.get(0)[6].toString(), LocalDateTime.parse(userDetails.get(0)[7].toString().replace(' ', 'T')), interests); 
+				userDetails.get(0)[5].toString(), userDetails.get(0)[6].toString(), LocalDateTime.parse(userDetails.get(0)[7].toString().replace(' ', 'T')), 
+				userDetails.get(0)[8].toString(), userDetails.get(0)[9].toString(), interests); 
+				
 		return usersResponse;
 	}
 	

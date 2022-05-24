@@ -13,7 +13,7 @@ public interface UsersRepo extends JpaRepository<Users, Integer>{
 	Optional<Users> findByMailid(String mailid);
 	Users findByUserid(int userid);
 	
-	@Query(value = "SELECT user_name,nick_name,password,mail_id,country,city,education_level,created_at FROM users where user_id=:userId",nativeQuery = true)
+	@Query(value = "SELECT user_name,nick_name,password,mail_id,country,city,education_level,created_at,role,signup_type FROM users where user_id=:userId",nativeQuery = true)
 	LinkedList<Object[]> findUserDetailsByUserid(int userId);
 	
 	@Query(value = "SELECT interest_names FROM interests where user_id=:userId",nativeQuery = true)

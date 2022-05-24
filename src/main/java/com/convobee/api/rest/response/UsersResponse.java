@@ -9,13 +9,15 @@ import lombok.Data;
 @Data
 @Builder
 public class UsersResponse {
-	private String userName;
-	private String nickName;
+	private String username;
+	private String nickname;
 	private String password;
-	private String mailId;
+	private String mailid;
 	private String country;
 	private String city;
-	private String educationLevel;
-	private LocalDateTime createdAt;
+	private String educationlevel;
+	private LocalDateTime createdat;
+	private String role;
+	private String signuptype;
 	private List<String> interests;
 }

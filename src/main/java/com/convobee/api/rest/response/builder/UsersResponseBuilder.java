@@ -12,17 +12,19 @@ public class UsersResponseBuilder {
 	public  UsersResponse buildResponse(
 			String userName,String nickName,String password,String mailId,
 			String country,String city,String educationLevel,
-			LocalDateTime createdAt,List<String> interests){
+			LocalDateTime createdAt,String role, String signuptype,List<String> interests){
 		UsersResponse user = UsersResponse.builder()
-								.userName(userName)
-								.nickName(nickName)
-								.mailId(mailId)
+								.username(userName)
+								.nickname(nickName)
+								.mailid(mailId)
 								.password(password)
 								.country(country)
 								.city(city)
-								.educationLevel(educationLevel)
+								.educationlevel(educationLevel)
 								.interests(interests)
-								.createdAt(createdAt).build();
+								.createdat(createdAt)
+								.role(role)
+								.signuptype(signuptype).build();
 		return user;
 		
 	}

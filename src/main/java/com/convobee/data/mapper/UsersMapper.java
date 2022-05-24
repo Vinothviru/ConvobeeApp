@@ -50,5 +50,24 @@ public class UsersMapper {
 		user.setModifiedat(DateTimeUtil.getCurrentUTCTime());
 		return user;
 	}
+	
+	public Users mapUserFromRequestForUpdate(UsersRequest usersRequest) throws Exception{
+		Users user = new Users();
+		user.setUserid(usersRequest.getUserid());
+		user.setUsername(usersRequest.getUsername());
+		user.setNickname(usersRequest.getNickname());
+		user.setPassword(passwordEncoder.encode(usersRequest.getPassword()));
+		user.setMailid(usersRequest.getMailid());
+		user.setCountry(usersRequest.getCountry());
+		user.setCity(usersRequest.getCity());
+		user.setEducationlevel(usersRequest.getEducationlevel());
+		user.setProficiencylevel(usersRequest.getProficiencylevel());
+		user.setModifiedat(DateTimeUtil.getCurrentUTCTime());
+		user.setCreatedat(usersRequest.getCreatedat());
+		user.setSignuptype(usersRequest.getSignuptype());
+		user.setRole(usersRequest.getRole());
+		user.setStatus(true);
+		return user;
+	}
 
 }

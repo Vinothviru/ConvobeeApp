@@ -1,5 +1,6 @@
 package com.convobee.api.rest.request;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import lombok.Data;
@@ -23,5 +24,6 @@ public class UsersRequest {
 	private List<String> interests;
 	private String token;
 	private String bvfhdjsk;
-	
+	private List<String> deleted_interests;
+	private Timestamp createdat;
 }
