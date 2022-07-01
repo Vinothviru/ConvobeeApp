@@ -1,5 +1,7 @@
 package com.convobee.data.mapper;
 
+import java.sql.Timestamp;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,14 +58,14 @@ public class UsersMapper {
 		user.setUserid(usersRequest.getUserid());
 		user.setUsername(usersRequest.getUsername());
 		user.setNickname(usersRequest.getNickname());
-		user.setPassword(passwordEncoder.encode(usersRequest.getPassword()));
+		user.setPassword(usersRequest.getPassword());
 		user.setMailid(usersRequest.getMailid());
 		user.setCountry(usersRequest.getCountry());
 		user.setCity(usersRequest.getCity());
 		user.setEducationlevel(usersRequest.getEducationlevel());
 		user.setProficiencylevel(usersRequest.getProficiencylevel());
 		user.setModifiedat(DateTimeUtil.getCurrentUTCTime());
-		user.setCreatedat(usersRequest.getCreatedat());
+		user.setCreatedat(Timestamp.valueOf(usersRequest.getCreatedat().replace('T', ' ')));
 		user.setSignuptype(usersRequest.getSignuptype());
 		user.setRole(usersRequest.getRole());
 		user.setStatus(true);

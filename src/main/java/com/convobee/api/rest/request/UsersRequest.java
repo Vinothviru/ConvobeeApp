@@ -25,5 +25,6 @@ public class UsersRequest {
 	private String token;
 	private String bvfhdjsk;
 	private List<String> deleted_interests;
-	private Timestamp createdat;
+	//Having createdat as String and not as timestamp because to avoid the UTC and local time discrepancy
+	private String createdat;
 }
