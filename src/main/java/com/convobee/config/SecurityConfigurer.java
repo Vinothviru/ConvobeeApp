@@ -78,6 +78,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 		.antMatchers("/getgraphlinechartforyear").hasAnyRole("USER","ADMIN")
 		.antMatchers("/getoverallgraphlinechart").hasAnyRole("USER","ADMIN")
 		.antMatchers("/getuserdetails").hasAnyRole("USER","ADMIN")
+		.antMatchers("/changepassword").hasAnyRole("USER","ADMIN")
 		.antMatchers("/getshareprofilelink").hasAnyRole("USER","ADMIN")
 		.antMatchers("/admin").hasRole("ADMIN")
 		.antMatchers("/hello").hasAnyRole("USER","ADMIN")

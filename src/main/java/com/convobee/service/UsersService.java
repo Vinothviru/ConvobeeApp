@@ -75,7 +75,7 @@ public class UsersService {
 			throw new Exception(Constants.USER_TRYING_TO_ACCESS_IRRELEVANT_DATA);
 		}
 		int userId = userUtil.getLoggedInUserId(request);
-		return getUsersResponse(userId);
+		return getUsersDetails(userId);
 	}
 	
 	public UsersResponse updateUserDetails(UsersRequest usersRequest) throws Exception {
@@ -90,10 +90,22 @@ public class UsersService {
 			List<Interests> interests = interestsMapper.mapInterestsFromRequest(user, usersRequest);
 			createInterestsForUser(interests);
 		}
-		return getUsersResponse(user.getUserid());
+		return getUsersDetails(user.getUserid());
 	}
 	
-	public UsersResponse getUsersResponse(int userId) throws Exception {
+	public UsersResponse changePassword(UsersRequest usersRequest) throws Exception {
+		int userId = usersRequest.getUserid();
+		String oldPassword = usersRequest.getOldPassword();
+		String newPassword = usersRequest.getPassword();
+		UsersResponse usersDetails = getUsersDetails(userId);
+		if(!(passwordEncoder.matches(oldPassword, usersDetails.getPassword()))) {
+			throw new Exception(Constants.INCORRECT_PASSWORD);
+		}
+		usersRepo.updatePassword(userId, passwordEncoder.encode(newPassword));
+		return usersDetails;
+	}
+	
+	public UsersResponse getUsersDetails(int userId) throws Exception {
 		LinkedList<Object[]> userDetails = usersRepo.findUserDetailsByUserid(userId);
 		List<String> interests = usersRepo.findInterestsByUserid(userId);
 		UsersResponse usersResponse = null;

@@ -11,6 +11,7 @@ public class UsersRequest {
 	private String username;
 	private String nickname;
 	private String password;
+	private String oldPassword;
 	private String mailid;
 	private String role;
 	private String country;

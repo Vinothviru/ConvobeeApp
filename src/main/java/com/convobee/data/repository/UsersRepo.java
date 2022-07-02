@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.convobee.data.entity.Users;
@@ -19,4 +20,7 @@ public interface UsersRepo extends JpaRepository<Users, Integer>{
 	@Query(value = "SELECT interest_names FROM interests where user_id=:userId",nativeQuery = true)
 	LinkedList<String> findInterestsByUserid(int userId);
 	
+	@Modifying
+	@Query(value = "UPDATE users SET password=:password where user_id=:userId",nativeQuery = true)
+	Integer updatePassword(int userId, String password);
 }

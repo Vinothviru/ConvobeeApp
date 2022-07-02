@@ -33,6 +33,11 @@ public class UserAPI {
 		//return usersService.getUserDetails(request);
 	}
 	
+	@RequestMapping(value = "/changepassword", method = RequestMethod.PATCH)
+	public ResponseEntity changePassword(@RequestBody UsersRequest request) throws Exception{
+		return  new BaseResponse().getResponse( ()-> usersService.changePassword(request));
+	}
+	
 	@RequestMapping(value = "/getjwtexpiration", method = RequestMethod.GET)
 	public ResponseEntity getJWTExpiration(HttpServletRequest request) throws Exception{
 		return  new BaseResponse().getResponse( ()-> usersService.isUserJWTGoingToExpire(request));
