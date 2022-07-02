@@ -50,8 +50,8 @@ public class AuthenticationAPI {
 	 * @param id
 	 * @return
 	 */
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public ResponseEntity loginAndCreateAuthenticationToken(@ModelAttribute AuthenticationRequest authenticationRequest) throws Exception{
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	public ResponseEntity loginAndCreateAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception{
 		return  new BaseResponse().getResponse( ()-> authenticationService.loginAuthentication(authenticationRequest));
 		//String jwt = authenticationService.loginAuthentication(authenticationRequest);
 		//return ResponseEntity.ok(new AuthenticationResponse(jwt));
