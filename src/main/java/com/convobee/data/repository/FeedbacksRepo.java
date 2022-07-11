@@ -14,17 +14,11 @@ public interface FeedbacksRepo extends JpaRepository<Feedbacks, Integer>{
 	@Query(value = "select * from feedbacks where meeting_id=:meetingId",nativeQuery = true)
 	List<Feedbacks> findByMeetingid(int meetingId);
 	
-	@Query(value = "select slot_time from slots where slot_id in(select meetings.slot_id as sid from meetings inner join feedbacks on meetings.meeting_id = feedbacks.meeting_id and feedbacks.receiver_user_id=:userid) order by slot_time desc limit 50",nativeQuery = true)
-	LinkedList<String> findSlotTimeByUserId(int userid);
+	@Query(value = "select feedbacks.feedback_id, slots.slot_time, users.nick_name from slots inner join meetings on meetings.slot_id = slots.slot_id inner join feedbacks on meetings.meeting_id = feedbacks.meeting_id and feedbacks.receiver_user_id=:userid inner join users on users.user_id=feedbacks.provider_user_id and feedbacks.receiver_user_id=:userid order by feedbacks.created_at desc limit 50",nativeQuery = true)
+	LinkedList<Object[]> findFeedbackHistorybyUserId(int userid);
 	
-	@Query(value = "select users.nick_name, feedbacks.feedback_id as fid from feedbacks inner join users on users.user_id=feedbacks.provider_user_id and feedbacks.receiver_user_id=:userid order by fid desc limit 50",nativeQuery = true)
-	LinkedList<Object[]> findNickNamesAndfeedbackIdByUserId(int userid);
-	
-	@Query(value = "select slot_time from slots where slot_id in(select meetings.slot_id as sid from meetings inner join feedbacks on meetings.meeting_id = feedbacks.meeting_id and feedbacks.receiver_user_id=:userid and feedbacks.feedback_id>:feedbackid) order by slot_time desc limit 50",nativeQuery = true)
-	LinkedList<String> findSlotTimeByUserIdAndFeedbackId(int userid, int feedbackid);
-	
-	@Query(value = "select users.nick_name, feedbacks.feedback_id as fid from feedbacks inner join users on users.user_id=feedbacks.provider_user_id and feedbacks.receiver_user_id=:userid and feedbacks.feedback_id>:feedbackid order by fid desc limit 50",nativeQuery = true)
-	LinkedList<Object[]> findNickNamesAndfeedbackIdByUserIdAndFeedbackId(int userid, int feedbackid);
+	@Query(value = "select feedbacks.feedback_id, slots.slot_time, users.nick_name from slots inner join meetings on meetings.slot_id = slots.slot_id inner join feedbacks on meetings.meeting_id = feedbacks.meeting_id and feedbacks.receiver_user_id=:userid and feedbacks.feedback_id<:feedbackid inner join users on users.user_id=feedbacks.provider_user_id and feedbacks.receiver_user_id=:userid order by feedbacks.created_at desc limit 50",nativeQuery = true)
+	LinkedList<Object[]> findFeedbackHistoryForConsecutiveRequestByUserIdAndFeedbackId(int userid, int feedbackid);
 	
 	@Query(value = "select slot_time from slots where slot_id in(select meetings.slot_id as sid from meetings inner join feedbacks on meetings.meeting_id = feedbacks.meeting_id and feedbacks.receiver_user_id=:userid) and slot_time between :startdatetime and :enddatetime order by slot_time desc",nativeQuery = true)
 	LinkedList<String> findSlotTimeByUserIdAndDateRange(int userid, String startdatetime, String enddatetime);
