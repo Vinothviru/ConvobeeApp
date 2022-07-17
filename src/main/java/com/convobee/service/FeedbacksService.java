@@ -122,9 +122,8 @@ public class FeedbacksService {
 		String timeZone = feedbacksHistoryRequest.getTimeZone();
 		String utcStartDateTime = DateTimeUtil.toUtc(LocalDateTime.parse(startDateTime), timeZone).toString().replace('T', ' ');
 		String utcEndDateTime = DateTimeUtil.toUtc(LocalDateTime.parse(endDateTime), timeZone).toString().replace('T', ' ');
-		LinkedList<String> listOfSlotTime = feedbacksRepo.findSlotTimeByUserIdAndDateRange(loggedinUserId, utcStartDateTime, utcEndDateTime);
-		LinkedList<Object[]> nickNameAndfeedbackIdList = feedbacksRepo.findNickNamesAndfeedbackIdByUserIdAndDateRange(loggedinUserId, utcStartDateTime, utcEndDateTime);
-		return processFeedbackHistory(nickNameAndfeedbackIdList, timeZone);
+		LinkedList<Object[]> feedbackHistory = feedbacksRepo.findFeedbackHistorybyUserIdAndCustomDateTimeRange(loggedinUserId, utcStartDateTime, utcEndDateTime);
+		return processFeedbackHistory(feedbackHistory, timeZone);
 	}
 	
 	/* Grouped two APIs -  getFeedbackHistory, getFeedbackHistoryForConsecutiveRequests */
