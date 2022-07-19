@@ -261,11 +261,10 @@ public class FeedbacksService {
 		String startDate = utcStartDateTime.toString().replace('T', ' ')+":00";
 		String endDate = utcEndDateTime.toString().replace('T', ' ')+":00";
 		
-		LinkedList<Timestamp> slotTime = feedbacksRepo.findSlotTimeByUserIdAndDateTime(loggedinUserId, startDate, endDate);
 		LinkedList<Object[]> skillFactors = feedbacksRepo.findSkillFactorsByUserIdAndDateTime(loggedinUserId, startDate, endDate);
 		LinkedList<LocalDate> slotDate = new LinkedList<LocalDate>();
-		for(Timestamp dt : slotTime) {
-			slotDate.add(DateTimeUtil.toZone(dt.toLocalDateTime(), ZoneId.of(Constants.UTC), ZoneId.of(timeZone)).toLocalDate());
+		for(int skillIndex=0; skillIndex<skillFactors.size(); skillIndex++) {
+			slotDate.add(DateTimeUtil.toZone(Timestamp.valueOf(skillFactors.get(skillIndex)[0].toString()).toLocalDateTime(), ZoneId.of(Constants.UTC), ZoneId.of(timeZone)).toLocalDate());
 		}
 		
 		/* Process of converting user time zone to UTC and querying and again converting to user time zone ends here*/
@@ -288,9 +287,9 @@ public class FeedbacksService {
 				
 				if(tempDate == date) {
 					count++;
-					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
-					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
-					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[3].toString());
 					
 					if(i == skillFactorsSize-1 && count > 1)
 					{
@@ -317,9 +316,9 @@ public class FeedbacksService {
 					tempDate = date;
 					count = 0;
 					count++;
-					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
-					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
-					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[3].toString());
 					
 					if(i == skillFactorsSize-1)
 					{
@@ -343,9 +342,9 @@ public class FeedbacksService {
 					tempDate = date;
 					count = 0;
 					count++;
-					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
-					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
-					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[3].toString());
 					
 					if(i == skillFactorsSize-1)
 					{
@@ -405,11 +404,10 @@ public class FeedbacksService {
 		LocalDateTime utcEndDateTime = DateTimeUtil.toUtc(endLocalDateTime, timeZone);
 		String startDate = utcStartDateTime.toString().replace('T', ' ')+":00";
 		String endDate = utcEndDateTime.toString().replace('T', ' ')+":00";
-		LinkedList<Timestamp> slotTime = feedbacksRepo.findSlotTimeByUserIdAndDateTime(loggedinUserId, startDate, endDate);
 		LinkedList<Object[]> skillFactors = feedbacksRepo.findSkillFactorsByUserIdAndDateTime(loggedinUserId, startDate, endDate);
 		LinkedList<LocalDate> slotDate = new LinkedList<LocalDate>();
-		for(Timestamp dt : slotTime) {
-			slotDate.add(DateTimeUtil.toZone(dt.toLocalDateTime(), ZoneId.of(Constants.UTC), ZoneId.of(timeZone)).toLocalDate());
+		for(int skillIndex=0; skillIndex<skillFactors.size(); skillIndex++) {
+			slotDate.add(DateTimeUtil.toZone(Timestamp.valueOf(skillFactors.get(skillIndex)[0].toString()).toLocalDateTime(), ZoneId.of(Constants.UTC), ZoneId.of(timeZone)).toLocalDate());
 		}
 		
 		LinkedList<Double> confidence = new LinkedList<Double>();
@@ -430,9 +428,9 @@ public class FeedbacksService {
 				
 				if(tempMonth == month) {
 					count++;
-					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
-					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
-					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[3].toString());
 					
 					if(i == skillFactorsSize-1 && count > 1)
 					{
@@ -459,9 +457,9 @@ public class FeedbacksService {
 					tempMonth = month;
 					count = 0;
 					count++;
-					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
-					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
-					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[3].toString());
 					
 					if(i == skillFactorsSize-1)
 					{
@@ -485,9 +483,9 @@ public class FeedbacksService {
 					tempMonth = month;
 					count = 0;
 					count++;
-					confidenceLevel += Double.valueOf(skillFactors.get(i)[0].toString());
-					impressionLevel += Double.valueOf(skillFactors.get(i)[1].toString());
-					proficiencyLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					confidenceLevel += Double.valueOf(skillFactors.get(i)[1].toString());
+					impressionLevel += Double.valueOf(skillFactors.get(i)[2].toString());
+					proficiencyLevel += Double.valueOf(skillFactors.get(i)[3].toString());
 					
 					if(i == skillFactorsSize-1)
 					{

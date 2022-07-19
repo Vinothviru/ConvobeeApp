@@ -34,13 +34,9 @@ public interface FeedbacksRepo extends JpaRepository<Feedbacks, Integer>{
 	
 	@Query(value = "select count(*) from feedbacks where receiver_user_id=:userId",nativeQuery = true)
 	Integer findTotalRowsByReceiveruserid(int userId);
-	
-	//@Query(value = "select slot_time from slots where slot_id in(select meetings.slot_id as sid from meetings inner join feedbacks on meetings.meeting_id = feedbacks.meeting_id and feedbacks.receiver_user_id=:userId) and slot_time between :startTime and :endTime",nativeQuery = true)
-	@Query(value = "select slot_time from slots where slot_id in(select meetings.slot_id from meetings inner join feedbacks on meetings.meeting_id = feedbacks.meeting_id and feedbacks.receiver_user_id=:userId) and slot_time between :startTime and :endTime order by slot_time",nativeQuery = true)
-	LinkedList<Timestamp> findSlotTimeByUserIdAndDateTime(int userId, String startTime, String endTime);
-	
-	@Query(value = "select confidence_level as confidence, impression_level as impression, proficiency_level as proficiency from feedbacks where meeting_id in (select meeting_id from meetings cm inner join slots as cs on cs.slot_id=cm.slot_id and (user_a_id=:userId or user_b_id=:userId) and slot_time between :startTime and :endTime order by slot_time) and receiver_user_id=:userId group by confidence,impression,proficiency",nativeQuery = true)
-	LinkedList<Object[]> findSkillFactorsByUserIdAndDateTime(int userId, String startTime, String endTime);
+
+	@Query(value = "select slot_time, confidence_level, impression_level, proficiency_level from feedbacks inner join meetings on feedbacks.meeting_id=meetings.meeting_id inner join slots on slots.slot_id=meetings.slot_id and slot_time between :startdatetime and :enddatetime and receiver_user_id=:userid order by slot_time asc",nativeQuery = true)
+	LinkedList<Object[]> findSkillFactorsByUserIdAndDateTime(int userid, String startdatetime, String enddatetime);
 	
 	@Query(value = "select confidence_level, impression_level, proficiency_level from feedbacks where receiver_user_id=:userId",nativeQuery = true)
 	LinkedList<Object[]> findOverAllSkillFactors(int userId);
