@@ -82,7 +82,7 @@ public class BookedSlotsService {
 			utc = utc.minusMinutes(3);//3 means, at backend query will check for extra 2 minutes only
 		}
 		
-		LinkedList<Object[]> listOfBookedslot = bookedSlotsRepo.findAllByUserid(userid, Timestamp.valueOf(utc.toLocalDateTime()));
+		LinkedList<Object[]> listOfBookedslot = bookedSlotsRepo.findBookedSlotIdAndSlotTimeByUserid(userid, Timestamp.valueOf(utc.toLocalDateTime()));
 		int size = listOfBookedslot.size();
 		for(int i = 0; i<size ;i++) {
 			SessionResponse sessionResponse = new SessionResponse();
