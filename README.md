@@ -1,6 +1,6 @@
 # ConvobeeApp
 First production application for building communication - Powered by OnePercent
-
+API Documentation -> https://documenter.getpostman.com/view/10247090/2sA3s7ioMp [PUBLIC ACCESS]
 
 Steps to do after deploying build:
 
@@ -27,3 +27,4 @@ API Contract -> https://docs.google.com/spreadsheets/d/1wfSSGtuGSoqc8Z91-sOMoBX8
 UX -> https://www.figma.com/proto/Cz0CzjgTTyK38zCqxRRkUZ/Untitled?page-id=0%3A1&node-id=156%3A236&viewport=241%2C48%2C0.31&scaling=min-zoom&starting-point-node-id=156%3A236
 
 Database -> https://online.visual-paradigm.com/community/share/convobee-erd-omufovdgl 
+
